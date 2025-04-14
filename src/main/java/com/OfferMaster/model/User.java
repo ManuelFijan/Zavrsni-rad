@@ -4,11 +4,11 @@ import com.OfferMaster.enums.PrimaryAreaOfWork;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "user")
+@Table(name = "users")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "user_id")
+    @Column(name = "id")
     private Long userId;
 
     @Column(unique = true, nullable = false)
