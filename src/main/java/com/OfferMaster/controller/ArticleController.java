@@ -30,4 +30,10 @@ public class ArticleController {
         ArticleDto createdArticle = articleService.createArticle(articleRequestDto);
         return ResponseEntity.ok(createdArticle);
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<ArticleDto> updateArticle(@PathVariable("id") Long articleId, @RequestBody ArticleRequestDto articleRequestDto) {
+        ArticleDto updatedArticle = articleService.updateArticle(articleId, articleRequestDto);
+        return ResponseEntity.ok(updatedArticle);
+    }
 }
