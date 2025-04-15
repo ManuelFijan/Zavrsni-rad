@@ -7,6 +7,7 @@ import com.OfferMaster.repository.ArticleRepository;
 import com.OfferMaster.service.ArticleService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -21,11 +22,17 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
-    public Page<ArticleDto> getArticles(int page, int size) {
-        PageRequest pageRequest = PageRequest.of(page, size);
-        Page<Article> articlePage = articleRepository.findAll(pageRequest);
-        Page<ArticleDto> dtoPage = articlePage.map(this::convertToDto);
-        return dtoPage;
+    public Page<ArticleDto> getArticles(int page, int size, String name) {
+        Pageable pageRequest = PageRequest.of(page, size);
+        Page<Article> articlePage;
+
+        if (name != null && !name.isEmpty()) {
+            articlePage = articleRepository.findByNameStartingWith(name, pageRequest);
+        } else {
+            articlePage = articleRepository.findAll(pageRequest);
+        }
+
+        return articlePage.map(this::convertToDto);
     }
 
     @Override

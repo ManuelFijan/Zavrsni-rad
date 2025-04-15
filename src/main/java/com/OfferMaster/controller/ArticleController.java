@@ -20,8 +20,8 @@ public class ArticleController {
     }
 
     @GetMapping()
-    public ResponseEntity<Page<ArticleDto>> getArticles(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "20") int size) {
-        Page<ArticleDto> articlesPage = articleService.getArticles(page, size);
+    public ResponseEntity<Page<ArticleDto>> getArticles(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "20") int size, @RequestParam(required = false) String search) {
+        Page<ArticleDto> articlesPage = articleService.getArticles(page, size, search);
         return ResponseEntity.ok(articlesPage);
     }
 
