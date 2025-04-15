@@ -1,3 +1,5 @@
+import axios from 'axios';
+
 // product type
 export interface Product {
     id: number;
@@ -6,6 +8,13 @@ export interface Product {
     price: number;
     description: string;
 }
+
+export const updateProduct = async (id: number, updatedProduct: Product): Promise<Product> => {
+    const response = await axios.put<Product>(`http://localhost:8080/articles/${id}`, updatedProduct, {
+        headers: { 'Content-Type': 'application/json' },
+    });
+    return response.data;
+};
 
 // mock "in-memory database" array
 let productsDb: Product[] = [
