@@ -1,9 +1,6 @@
 package com.OfferMaster.service.impl;
 
-import com.OfferMaster.dto.LoginRequestDto;
-import com.OfferMaster.dto.LoginResponseDto;
-import com.OfferMaster.dto.UserDto;
-import com.OfferMaster.dto.UserRegistrationDto;
+import com.OfferMaster.dto.*;
 import com.OfferMaster.mapper.UserMapper;
 import com.OfferMaster.model.User;
 import com.OfferMaster.repository.UserRepository;
@@ -13,8 +10,12 @@ import com.OfferMaster.service.UserService;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -59,5 +60,22 @@ public class UserServiceImpl implements UserService {
         }
         String token = jwtUtil.generateToken(user.getEmail());
         return new LoginResponseDto(token, userMapper.toDto(user));
+    }
+
+    @Override
+    public UserDto updateUserProfile(UserProfileUpdateDto profileUpdateDto) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentEmail = authentication.getName();
+
+        User user = userRepository.findByEmail(currentEmail)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found with email " + currentEmail));
+
+        user.setFirstName(profileUpdateDto.getFirstName());
+        user.setLastName(profileUpdateDto.getLastName());
+        user.setEmail(profileUpdateDto.getEmail());
+        user.setPrimaryAreaOfWork(profileUpdateDto.getPrimaryAreaOfWork());
+
+        User updatedUser = userRepository.save(user);
+        return userMapper.toDto(updatedUser);
     }
 }

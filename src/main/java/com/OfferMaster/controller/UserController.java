@@ -1,9 +1,6 @@
 package com.OfferMaster.controller;
 
-import com.OfferMaster.dto.LoginRequestDto;
-import com.OfferMaster.dto.LoginResponseDto;
-import com.OfferMaster.dto.UserDto;
-import com.OfferMaster.dto.UserRegistrationDto;
+import com.OfferMaster.dto.*;
 import com.OfferMaster.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,5 +28,11 @@ public class UserController {
     public ResponseEntity<LoginResponseDto> login(@Valid @RequestBody LoginRequestDto loginRequest) {
         LoginResponseDto loginResponse = userService.loginUser(loginRequest);
         return ResponseEntity.ok(loginResponse);
+    }
+
+    @PutMapping("/update")
+    public ResponseEntity<UserDto> updateProfile(@Valid @RequestBody UserProfileUpdateDto profileUpdateDto) {
+        UserDto updatedUser = userService.updateUserProfile(profileUpdateDto);
+        return ResponseEntity.ok(updatedUser);
     }
 }
