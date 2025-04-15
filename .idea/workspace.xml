@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="3694cb8b-40c4-4407-bcc1-59c645812f6b" name="Changes" comment="Napravljene sve (mock)funkcionalnosti: pravljenje ponuda, kalendar, razgovori, pregled gradilišta, baza proizvoda. Omogućene sesije.">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="TypeScript File" />
+        <option value="TypeScript JSX File" />
+        <option value="JavaScript File" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;ManuelFijan&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/ManuelFijan/Zavrsni-rad.git&quot;,
+    &quot;accountId&quot;: &quot;72167677-edba-467b-af07-04b38a77ca41&quot;
+  }
+}</component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 1
+}</component>
+  <component name="ProjectId" id="2noN3zaaoonj2ZMTQcropL8v3c8" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/Manuel/WebstormProjects/Projekt-R/public/images&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;npm.npm start.executor&quot;: &quot;Run&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;org.jetbrains.plugins.github.ui.GithubSettingsConfigurable&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;C:\\Users\\Manuel\\WebstormProjects\\Projekt-R\\node_modules\\typescript\\lib&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  }
+}</component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\Manuel\WebstormProjects\Projekt-R\public\images" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\Manuel\WebstormProjects\Projekt-R\src\components" />
+    </key>
+  </component>
+  <component name="RunManager">
+    <configuration name="npm start" type="js.build_tools.npm">
+      <package-json value="$PROJECT_DIR$/package.json" />
+      <command value="run" />
+      <scripts>
+        <script value="start" />
+      </scripts>
+      <node-interpreter value="project" />
+      <envs />
+      <method v="2" />
+    </configuration>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-js-predefined-d6986cc7102b-5c90d61e3bab-JavaScript-WS-242.23339.15" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="3694cb8b-40c4-4407-bcc1-59c645812f6b" name="Changes" comment="" />
+      <created>1729635275115</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1729635275115</updated>
+      <workItem from="1729635277248" duration="467000" />
+      <workItem from="1729635757176" duration="430000" />
+      <workItem from="1729675407258" duration="879000" />
+      <workItem from="1729797140834" duration="42000" />
+      <workItem from="1729886106765" duration="2280000" />
+      <workItem from="1730125549800" duration="3261000" />
+      <workItem from="1730227542982" duration="7681000" />
+      <workItem from="1730929992670" duration="4191000" />
+      <workItem from="1730967981380" duration="1104000" />
+      <workItem from="1730984374307" duration="38000" />
+      <workItem from="1730984752251" duration="83000" />
+      <workItem from="1731502198780" duration="1222000" />
+      <workItem from="1735493482150" duration="2000" />
+      <workItem from="1736165431969" duration="680000" />
+      <workItem from="1736183823663" duration="11232000" />
+      <workItem from="1736278864625" duration="7712000" />
+      <workItem from="1736854229542" duration="20647000" />
+      <workItem from="1736941963821" duration="10868000" />
+      <workItem from="1737032972863" duration="2679000" />
+      <workItem from="1737043693143" duration="892000" />
+      <workItem from="1737106247299" duration="727000" />
+      <workItem from="1737123573996" duration="1588000" />
+      <workItem from="1737974855224" duration="2830000" />
+      <workItem from="1737983231627" duration="1137000" />
+      <workItem from="1737987239065" duration="9432000" />
+      <workItem from="1741913395245" duration="805000" />
+      <workItem from="1742949007932" duration="1043000" />
+      <workItem from="1743020072877" duration="430000" />
+      <workItem from="1743397612630" duration="3000" />
+      <workItem from="1743602098785" duration="2000" />
+      <workItem from="1744056015049" duration="596000" />
+      <workItem from="1744722662641" duration="2214000" />
+      <workItem from="1744748816728" duration="842000" />
+    </task>
+    <task id="LOCAL-00001" summary="inicijalni commit">
+      <option name="closed" value="true" />
+      <created>1729635983312</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1729635983312</updated>
+    </task>
+    <task id="LOCAL-00002" summary="Dodana &quot;o nama&quot; stranica. Logo, footer i back button pretvoreni u komponente">
+      <option name="closed" value="true" />
+      <created>1730236279076</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1730236279076</updated>
+    </task>
+    <task id="LOCAL-00003" summary="ispravak greške">
+      <option name="closed" value="true" />
+      <created>1730968350527</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1730968350527</updated>
+    </task>
+    <task id="LOCAL-00004" summary="napravljene glavne komponente">
+      <option name="closed" value="true" />
+      <created>1736292537213</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1736292537213</updated>
+    </task>
+    <task id="LOCAL-00005" summary="Napravljene sve (mock)funkcionalnosti: pravljenje ponuda, kalendar, razgovori, pregled gradilišta, baza proizvoda. Omogućene sesije.">
+      <option name="closed" value="true" />
+      <created>1736983291373</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1736983291373</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="inicijalni commit" />
+    <MESSAGE value="Dodana &quot;o nama&quot; stranica. Logo, footer i back button pretvoreni u komponente" />
+    <MESSAGE value="ispravak greške" />
+    <MESSAGE value="napravljene glavne komponente" />
+    <MESSAGE value="Napravljene sve (mock)funkcionalnosti: pravljenje ponuda, kalendar, razgovori, pregled gradilišta, baza proizvoda. Omogućene sesije." />
+    <option name="LAST_COMMIT_MESSAGE" value="Napravljene sve (mock)funkcionalnosti: pravljenje ponuda, kalendar, razgovori, pregled gradilišta, baza proizvoda. Omogućene sesije." />
+  </component>
+</project>
