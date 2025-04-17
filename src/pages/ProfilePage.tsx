@@ -1,34 +1,22 @@
-import React, {useEffect, useState} from "react";
+import React, {useState} from "react";
 import Logo from "../components/Logo";
 import BackButton from "../components/BackButton";
-import { getUserProfile, updateUserProfile, User } from "../services/UserService";
+import { updateUserProfile, UserDto } from "../services/UserService";
 
 function ProfilePage() {
-    const [user, setUser] = useState<User | null>(null);
-    const [formData, setFormData] = useState<User>({
+    const [formData, setFormData] = useState<UserDto>({
+        userId: 0,
         firstName: "",
         lastName: "",
         email: "",
-        primaryBusinessArea: "",
-        profilePicture: "",
+        primaryAreaOfWork: "",
     });
 
-    //fetch user data from service
-    useEffect(() => {
-        (async () => {
-            try {
-                const fetchedUser = await getUserProfile();
-                setUser(fetchedUser);
-                setFormData({ ...fetchedUser });
-            } catch (err) {
-                console.error("Failed to load profile:", err);
-            }
-        })();
-    }, []);
-
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const handleChange = (
+        e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    ) => {
         const { name, value } = e.target;
-        setFormData(prev => ({
+        setFormData((prev) => ({
             ...prev,
             [name]: value,
         }));
@@ -37,8 +25,13 @@ function ProfilePage() {
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         try {
-            const updatedUser = await updateUserProfile(formData);
-            setUser(updatedUser); // sync state
+            const updated = await updateUserProfile({
+                firstName: formData.firstName,
+                lastName: formData.lastName,
+                email: formData.email,
+                primaryAreaOfWork: formData.primaryAreaOfWork,
+            });
+            setFormData(updated);
             alert("Podaci uspješno ažurirani!");
         } catch (err) {
             alert("Nešto je pošlo po krivu prilikom ažuriranja profila.");
@@ -62,11 +55,7 @@ function ProfilePage() {
                         <form onSubmit={handleSubmit} className="space-y-6">
 
                             <div className="flex flex-col items-center">
-                                <img
-                                    src={user?.profilePicture}
-                                    alt="Profile"
-                                    className="h-24 w-24 rounded-full object-cover mb-4"
-                                />
+
                             </div>
 
                             <div>
@@ -126,17 +115,16 @@ function ProfilePage() {
                                 </label>
                                 <div className="mt-2">
                                     <select
-                                        id="primaryBusinessArea"
-                                        name="primaryBusinessArea"
+                                        id="primaryAreaOfWork"
+                                        name="primaryAreaOfWork"
                                         required
-                                        value={formData.primaryBusinessArea}
+                                        value={formData.primaryAreaOfWork}
                                         onChange={handleChange}
-                                        className="block w-full rounded-md border-0 py-2 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-orange-300 sm:text-sm"
                                     >
-                                        <option>Grubi radovi</option>
-                                        <option>Voda i plin</option>
-                                        <option>Elektrika</option>
-                                        <option>Keramika</option>
+                                        <option value="GRUBI_RADOVI">Grubi radovi</option>
+                                        <option value="VODA_I_PLIN">Voda i plin</option>
+                                        <option value="ELEKTRIKA">Elektrika</option>
+                                        <option value="KERAMIKA">Keramika</option>
                                     </select>
                                 </div>
                             </div>

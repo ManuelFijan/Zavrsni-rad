@@ -1,34 +1,22 @@
-export interface User {
+import apiClient from "./axiosConfig";
+
+export interface UserDto {
+    userId: number;
+    email: string;
+    firstName: string;
+    lastName: string;
+    primaryAreaOfWork: string;
+}
+
+export async function updateUserProfile(profile: {
     firstName: string;
     lastName: string;
     email: string;
-    primaryBusinessArea: string;
-    profilePicture: string;
-}
-
-let mockUser: User = {
-    firstName: "Ivo",
-    lastName: "Ivić",
-    email: "ivo@gmail.com",
-    primaryBusinessArea: "Grubi radovi",
-    profilePicture: "/images/worker.jpg",
-};
-
-// function to get the mock user profile
-export async function getUserProfile(): Promise<User> {
-    return new Promise((resolve) => {
-        setTimeout(() => {
-            resolve(mockUser);
-        }, 300);
-    });
-}
-
-// function to update the mock user profile
-export async function updateUserProfile(updates: User): Promise<User> {
-    return new Promise((resolve) => {
-        setTimeout(() => {
-            mockUser = { ...updates };
-            resolve(mockUser);
-        }, 300);
-    });
+    primaryAreaOfWork: string;
+}): Promise<UserDto> {
+    const response = await apiClient.put<UserDto>(
+        "/api/auth/update",
+        profile
+    );
+    return response.data;
 }
