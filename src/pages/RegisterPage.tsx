@@ -11,26 +11,21 @@ function RegisterPage() {
     const [lastName, setLastName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [primaryBusinessArea, setPrimaryBusinessArea] = useState("Grubi radovi");
+    const [primaryAreaOfWork, setPrimaryAreaOfWork] = useState("GRUBI_RADOVI");
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
-        if (!firstName || !lastName || !email || !password || !primaryBusinessArea) {
+        if (!firstName || !lastName || !email || !password || !primaryAreaOfWork) {
             alert("Molimo vas da popunite sva polja.");
             return;
         }
 
         try {
-            const response = await register(
-                firstName,
-                lastName,
-                email,
-                password,
-                primaryBusinessArea
+            const {accessToken, user} = await register(
+                firstName, lastName, email, password, primaryAreaOfWork
             );
-            console.log("Registration success:", response);
-            alert(response.message);
+            console.log("Registration success:", accessToken, user);
 
             navigate("/homepage");
         } catch (err: any) {
@@ -61,6 +56,7 @@ function RegisterPage() {
                                     name="firstName"
                                     type="text"
                                     required
+                                    autoComplete="off"
                                     value={firstName}
                                     onChange={(e) => setFirstName(e.target.value)}
                                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-orange-300 sm:text-sm sm:leading-6"
@@ -78,6 +74,7 @@ function RegisterPage() {
                                     name="lastName"
                                     type="text"
                                     required
+                                    autoComplete="off"
                                     value={lastName}
                                     onChange={(e) => setLastName(e.target.value)}
                                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-orange-300 sm:text-sm sm:leading-6"
@@ -92,11 +89,11 @@ function RegisterPage() {
                             </label>
                             <div className="mt-2">
                                 <input
-                                    id="registerEmail"
-                                    name="registerEmail"
+                                    id="email"
+                                    name="email"
                                     type="email"
                                     required
-                                    autoComplete="email"
+                                    autoComplete="off"
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
                                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-orange-300 sm:text-sm sm:leading-6"
@@ -111,8 +108,8 @@ function RegisterPage() {
                             </label>
                             <div className="mt-2">
                                 <input
-                                    id="registerPassword"
-                                    name="registerPassword"
+                                    id="password"
+                                    name="password"
                                     type="password"
                                     required
                                     autoComplete="new-password"
@@ -124,23 +121,23 @@ function RegisterPage() {
                         </div>
 
                         <div>
-                            <label htmlFor="primaryBusinessArea"
+                            <label htmlFor="primaryAreaOfWork"
                                    className="block text-sm font-medium leading-6 text-gray-900">
                                 Primarno područje poslovanja
                             </label>
                             <div className="mt-2">
                                 <select
-                                    id="primaryBusinessArea"
-                                    name="primaryBusinessArea"
+                                    id="primaryAreaOfWork"
+                                    name="primaryAreaOfWork"
                                     required
-                                    value={primaryBusinessArea}
-                                    onChange={(e) => setPrimaryBusinessArea(e.target.value)}
+                                    value={primaryAreaOfWork}
+                                    onChange={(e) => setPrimaryAreaOfWork(e.target.value)}
                                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-orange-300 sm:text-sm sm:leading-6"
                                 >
-                                    <option>Grubi radovi</option>
-                                    <option>Voda i plin</option>
-                                    <option>Elektrika</option>
-                                    <option>Keramika</option>
+                                    <option value="GRUBI_RADOVI">Grubi radovi</option>
+                                    <option value="VODA_I_PLIN">Voda i plin</option>
+                                    <option value="ELEKTRIKA">Elektrika</option>
+                                    <option value="KERAMIKA">Keramika</option>
                                 </select>
                             </div>
                         </div>

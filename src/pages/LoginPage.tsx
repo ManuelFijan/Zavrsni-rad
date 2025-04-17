@@ -19,8 +19,8 @@ function LoginPage() {
         }
 
         try {
-            const response = await login(email, password);
-            console.log("Received token:", response.token);
+            const { accessToken, user } = await login(email, password);
+            console.log("JWT:", accessToken, "User:", user);
             navigate("/homepage");
         } catch (err: any) {
             alert(err);

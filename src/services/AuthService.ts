@@ -1,18 +1,36 @@
-import { saveToken } from "./AuthSession";
+import {saveToken} from "./AuthSession";
+import apiClient from "./axiosConfig";
 
-export async function login(email: string, password: string): Promise<{ token: string }> {
-    return new Promise((resolve, reject) => {
-        // simulate a short delay
-        setTimeout(() => {
-            if (email && password) {
-                const token = "MOCK_TOKEN_VALUE";
-                saveToken(token);
-                resolve({ token });
-            } else {
-                reject("Invalid credentials");
-            }
-        }, 500);
-    });
+export interface User {
+    userId: number;
+    email: string;
+    firstName: string;
+    lastName: string;
+    primaryAreaOfWork: string;
+}
+
+export interface LoginResponse {
+    accessToken: string;
+    tokenType: string;
+    user: User;
+}
+
+export async function login(
+    email: string,
+    password: string
+): Promise<LoginResponse> {
+    const response = await apiClient.post<LoginResponse>(
+        "/api/auth/login",
+        {identifier: email, password}
+    );
+
+    const {accessToken, tokenType, user} = response.data;
+    const fullToken = `${tokenType} ${accessToken}`;
+
+    saveToken(fullToken);
+    apiClient.defaults.headers.common["Authorization"] = fullToken;
+
+    return {accessToken, tokenType, user};
 }
 
 export async function register(
@@ -20,21 +38,18 @@ export async function register(
     lastName: string,
     email: string,
     password: string,
-    primaryBusinessArea: string
-): Promise<{ userId: string; message: string; token: string }> {
-    return new Promise((resolve, reject) => {
-        setTimeout(() => {
-            if (email === "existinguser@example.com") {
-                reject("Ovaj email je već registriran.");
-            } else {
-                const token = "NEW_USER_TOKEN_VALUE";
-                saveToken(token);
-                resolve({
-                    userId: "MOCK_USER_ID",
-                    message: "Korisnik uspješno kreiran",
-                    token,
-                });
-            }
-        }, 500);
-    });
+    primaryAreaOfWork: string
+): Promise<LoginResponse> {
+    const response = await apiClient.post<LoginResponse>(
+        "/api/auth/register",
+        {firstName, lastName, email, password, primaryAreaOfWork}
+    );
+
+    const {accessToken, tokenType, user} = response.data;
+    const fullToken = `${tokenType} ${accessToken}`;
+
+    saveToken(fullToken);
+    apiClient.defaults.headers.common["Authorization"] = fullToken;
+
+    return {accessToken, tokenType, user};
 }
