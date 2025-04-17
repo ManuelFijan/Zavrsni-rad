@@ -1,5 +1,5 @@
-import React, { useEffect, useRef, useState, useCallback } from 'react';
-import { Product, getProducts, addProduct, updateProduct } from "../services/ProductService";
+import React, {useEffect, useRef, useState, useCallback} from 'react';
+import {Product, getProducts, createProduct, updateProduct} from "../services/ProductService";
 
 const ProductsPage: React.FC = () => {
     const [products, setProducts] = useState<Product[]>([]);
@@ -22,17 +22,17 @@ const ProductsPage: React.FC = () => {
         didFetchRef.current = true;
         (async () => {
             try {
-                const fetchedProducts = await getProducts();
-                setProducts(fetchedProducts);
+                const fetchedPage = await getProducts();
+                setProducts(fetchedPage.content);
             } catch (err) {
                 console.error("Failed to fetch products:", err);
             }
         })();
     }, []);
 
-    const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
         setSearchQuery(e.target.value);
-    };
+    }, []);
 
     const filteredProducts = products.filter((product) =>
         product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -42,11 +42,11 @@ const ProductsPage: React.FC = () => {
     const openAddModal = () => setIsAddModalOpen(true);
     const closeAddModal = () => {
         setIsAddModalOpen(false);
-        setNewProduct({ name: '', category: '', price: 0, description: '' });
+        setNewProduct({name: '', category: '', price: 0, description: ''});
     };
 
-    const handleAddInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        const { name, value } = e.target;
+    const handleAddInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+        const {name, value} = e.target;
         setNewProduct((prev) => ({
             ...prev,
             [name]: name === 'price' ? parseFloat(value) : value,
@@ -59,8 +59,8 @@ const ProductsPage: React.FC = () => {
         if (isSubmittingRef.current) return;
         isSubmittingRef.current = true;
         try {
-            const createdProduct = await addProduct(newProduct);
-            setProducts([...products, createdProduct]);
+            const created = await createProduct(newProduct);
+            setProducts(prev => [...prev, created]);
             closeAddModal();
         } catch (err: any) {
             alert(err);
@@ -79,8 +79,8 @@ const ProductsPage: React.FC = () => {
         setEditingProduct(null);
     };
 
-    const handleEditInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        const { name, value } = e.target;
+    const handleEditInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+        const {name, value} = e.target;
         if (editingProduct) {
             setEditingProduct({
                 ...editingProduct,
@@ -91,15 +91,21 @@ const ProductsPage: React.FC = () => {
 
     const handleUpdateProduct = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (editingProduct) {
-            try {
-                const updatedProduct = await updateProduct(editingProduct.id, editingProduct);
-                setProducts(products.map(prod => prod.id === updatedProduct.id ? updatedProduct : prod));
-                closeEditModal();
-            } catch (err: any) {
-                alert(err);
-            }
-        }
+        if (!editingProduct) return;
+
+        console.log("Updating product:", editingProduct);
+        const updatedProduct = await updateProduct(editingProduct.id, {
+            name: editingProduct.name,
+            category: editingProduct.category,
+            price: editingProduct.price,
+            description: editingProduct.description,
+        });
+
+        setProducts((prev) =>
+            prev.map((p) => (p.id === updatedProduct.id ? updatedProduct : p))
+        );
+
+        closeEditModal();
     };
 
     return (
@@ -128,7 +134,9 @@ const ProductsPage: React.FC = () => {
                     <tr>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Naziv</th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kategorija</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cijena (€)</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cijena
+                            (€)
+                        </th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Opis</th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"></th>
                     </tr>
@@ -168,8 +176,10 @@ const ProductsPage: React.FC = () => {
                             className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
                             aria-hidden="true"
                         ></div>
-                        <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-                        <div className="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
+                        <span className="hidden sm:inline-block sm:align-middle sm:h-screen"
+                              aria-hidden="true">&#8203;</span>
+                        <div
+                            className="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
                             <div>
                                 <div className="mt-3 text-center sm:mt-5">
                                     <h3 className="text-lg leading-6 font-medium text-gray-900" id="modal-title">
@@ -178,7 +188,8 @@ const ProductsPage: React.FC = () => {
                                     <div className="mt-2">
                                         <form onSubmit={handleAddProduct}>
                                             <div className="mb-4">
-                                                <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+                                                <label htmlFor="name"
+                                                       className="block text-sm font-medium text-gray-700">
                                                     Naziv
                                                 </label>
                                                 <input
@@ -192,21 +203,27 @@ const ProductsPage: React.FC = () => {
                                                 />
                                             </div>
                                             <div className="mb-4">
-                                                <label htmlFor="category" className="block text-sm font-medium text-gray-700">
+                                                <label htmlFor="category"
+                                                       className="block text-sm font-medium text-gray-700">
                                                     Kategorija
                                                 </label>
-                                                <input
-                                                    type="text"
+                                                <select
                                                     name="category"
                                                     id="category"
                                                     value={newProduct.category}
                                                     onChange={handleAddInputChange}
                                                     required
-                                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500 sm:text-sm"
-                                                />
+                                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm
+                                                ocus:border-orange-500 focus:ring-orange-500 sm:text-sm"
+                                                >
+                                                    <option value="">— odaberite —</option>
+                                                    <option value="USLUGA">Usluga</option>
+                                                    <option value="GRAĐEVINSKI_MATERIJAL">Građevinski materijal</option>
+                                                </select>
                                             </div>
                                             <div className="mb-4">
-                                                <label htmlFor="price" className="block text-sm font-medium text-gray-700">
+                                                <label htmlFor="price"
+                                                       className="block text-sm font-medium text-gray-700">
                                                     Cijena (€)
                                                 </label>
                                                 <input
@@ -222,7 +239,8 @@ const ProductsPage: React.FC = () => {
                                                 />
                                             </div>
                                             <div className="mb-4">
-                                                <label htmlFor="description" className="block text-sm font-medium text-gray-700">
+                                                <label htmlFor="description"
+                                                       className="block text-sm font-medium text-gray-700">
                                                     Opis
                                                 </label>
                                                 <textarea
@@ -268,7 +286,8 @@ const ProductsPage: React.FC = () => {
                         <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">
               &#8203;
             </span>
-                        <div className="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
+                        <div
+                            className="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
                             <div>
                                 <div className="mt-3 text-center sm:mt-5">
                                     <h3
@@ -280,7 +299,8 @@ const ProductsPage: React.FC = () => {
                                     <div className="mt-2">
                                         <form onSubmit={handleUpdateProduct}>
                                             <div className="mb-4">
-                                                <label htmlFor="edit-name" className="block text-sm font-medium text-gray-700">
+                                                <label htmlFor="edit-name"
+                                                       className="block text-sm font-medium text-gray-700">
                                                     Naziv
                                                 </label>
                                                 <input
@@ -294,21 +314,27 @@ const ProductsPage: React.FC = () => {
                                                 />
                                             </div>
                                             <div className="mb-4">
-                                                <label htmlFor="edit-category" className="block text-sm font-medium text-gray-700">
+                                                <label htmlFor="category"
+                                                       className="block text-sm font-medium text-gray-700">
                                                     Kategorija
                                                 </label>
-                                                <input
-                                                    type="text"
+                                                <select
                                                     name="category"
-                                                    id="edit-category"
+                                                    id="category"
                                                     value={editingProduct.category}
                                                     onChange={handleEditInputChange}
                                                     required
-                                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                                                />
+                                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm
+                                                ocus:border-orange-500 focus:ring-orange-500 sm:text-sm"
+                                                >
+                                                    <option value="">— odaberite —</option>
+                                                    <option value="USLUGA">Usluga</option>
+                                                    <option value="GRAĐEVINSKI_MATERIJAL">Građevinski materijal</option>
+                                                </select>
                                             </div>
                                             <div className="mb-4">
-                                                <label htmlFor="edit-price" className="block text-sm font-medium text-gray-700">
+                                                <label htmlFor="edit-price"
+                                                       className="block text-sm font-medium text-gray-700">
                                                     Cijena (€)
                                                 </label>
                                                 <input
@@ -324,7 +350,8 @@ const ProductsPage: React.FC = () => {
                                                 />
                                             </div>
                                             <div className="mb-4">
-                                                <label htmlFor="edit-description" className="block text-sm font-medium text-gray-700">
+                                                <label htmlFor="edit-description"
+                                                       className="block text-sm font-medium text-gray-700">
                                                     Opis
                                                 </label>
                                                 <textarea

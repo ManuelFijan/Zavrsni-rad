@@ -34,7 +34,7 @@ const QuotesPage: React.FC = () => {
         (async () => {
             try {
                 const fetchedProducts = await getProducts();
-                setProducts(fetchedProducts);
+                setProducts(fetchedProducts.content);
 
                 const fetchedQuotes = await getQuotes();
                 setQuotes(fetchedQuotes);

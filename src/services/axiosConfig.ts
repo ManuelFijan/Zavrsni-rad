@@ -7,7 +7,10 @@ const apiClient = axios.create({
 });
 
 apiClient.interceptors.request.use((config) => {
-    const token = getToken();
+    let token = getToken();
+    if (!token) return config;
+    token = token.replace(/^Bearer\s+/i, "").trim();
+
     if (token) {
         config.headers = config.headers || {};
         config.headers.Authorization = `Bearer ${token}`;

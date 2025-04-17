@@ -1,6 +1,13 @@
-import axios from 'axios';
+import apiClient from "./axiosConfig";
 
-// product type
+interface RawProduct {
+    articleId: number;
+    name: string;
+    category: string;
+    price: number;
+    description: string;
+}
+
 export interface Product {
     id: number;
     name: string;
@@ -9,65 +16,56 @@ export interface Product {
     description: string;
 }
 
-export const updateProduct = async (id: number, updatedProduct: Product): Promise<Product> => {
-    const response = await axios.put<Product>(`http://localhost:8080/articles/${id}`, updatedProduct, {
-        headers: { 'Content-Type': 'application/json' },
-    });
-    return response.data;
-};
-
-// mock "in-memory database" array
-let productsDb: Product[] = [
-    {
-        id: 1,
-        name: "Cijev CU 5m",
-        category: "Građevinski Materijal",
-        price: 30.0,
-        description: "Opis",
-    },
-    {
-        id: 2,
-        name: "Čavao",
-        category: "Građevinski Materijal",
-        price: 1.0,
-        description: "Opis",
-    },
-    {
-        id: 3,
-        name: "Cement",
-        category: "Građevinski Materijal",
-        price: 15.0,
-        description: "Opis",
-    },
-]
-
-// fetching products from the "database"
-export async function getProducts(): Promise<Product[]> {
-    return new Promise((resolve) => {
-        setTimeout(() => {
-            resolve(productsDb);
-        }, 300);
-    });
+export interface PaginatedProducts {
+    content: Product[];
+    totalElements: number;
+    totalPages: number;
+    size: number;
+    number: number;
 }
 
-let nextId = 100;
-// adding a product to the "database"
-export async function addProduct(newProduct: Omit<Product, "id">): Promise<Product> {
-    return new Promise((resolve, reject) => {
-        setTimeout(() => {
-            console.log("[addProduct] CALLED with:", newProduct);
-            if (
-                !newProduct.name ||
-                !newProduct.category ||
-                newProduct.price === undefined ||
-                !newProduct.description
-            ) {
-                reject("Molimo popunite sva polja.");
-            } else {
-                const product: Product = { id: nextId++, ...newProduct };
-                //productsDb.push(product);
-                resolve(product);
-            }
-        }, 300);
-    });
+function normalizeProduct(raw: RawProduct): Product {
+    return {
+        id: raw.articleId,
+        name: raw.name,
+        category: raw.category,
+        price: raw.price,
+        description: raw.description,
+    };
+}
+
+export async function getProducts(
+    page: number = 0,
+    size: number = 20,
+    search?: string
+): Promise<PaginatedProducts> {
+    const params: any = {page, size};
+    if (search) params.search = search;
+    const response = await apiClient.get<{
+        content: RawProduct[];
+        totalElements: number;
+        totalPages: number;
+        size: number;
+        number: number;
+    }>("/articles", {params});
+    const data = response.data;
+    return {
+        ...data,
+        content: data.content.map(normalizeProduct),
+    };
+}
+
+export async function createProduct(
+    product: Omit<Product, "id">
+): Promise<Product> {
+    const response = await apiClient.post<RawProduct>("/articles", product);
+    return normalizeProduct(response.data);
+}
+
+export async function updateProduct(
+    id: number,
+    product: Omit<Product, "id">
+): Promise<Product> {
+    const response = await apiClient.put<RawProduct>(`/articles/${id}`, product);
+    return normalizeProduct(response.data);
 }
