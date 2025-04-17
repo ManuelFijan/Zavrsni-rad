@@ -1,6 +1,7 @@
 package com.OfferMaster.controller;
 
 import com.OfferMaster.dto.*;
+import com.OfferMaster.security.JwtUtil;
 import com.OfferMaster.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,16 +13,19 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
     private final UserService userService;
+    private final JwtUtil jwtUtil;
 
     @Autowired
-    public UserController(UserService userService) {
+    public UserController(UserService userService, JwtUtil jwtUtil) {
         this.userService = userService;
+        this.jwtUtil = jwtUtil;
     }
 
     @PostMapping("/register")
-    public ResponseEntity<UserDto> register(@Valid @RequestBody UserRegistrationDto registrationDto) {
+    public ResponseEntity<RegistrationResponseDto> register(@Valid @RequestBody UserRegistrationDto registrationDto) {
         UserDto userDto = userService.registerUser(registrationDto);
-        return ResponseEntity.ok(userDto);
+        String token = jwtUtil.generateToken(userDto.getEmail());
+        return ResponseEntity.ok(new RegistrationResponseDto(token, userDto));
     }
 
     @PostMapping("/login")
