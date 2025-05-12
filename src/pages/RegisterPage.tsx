@@ -12,9 +12,11 @@ function RegisterPage() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [primaryAreaOfWork, setPrimaryAreaOfWork] = useState("GRUBI_RADOVI");
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+        setErrorMessage(null)
 
         if (!firstName || !lastName || !email || !password || !primaryAreaOfWork) {
             alert("Molimo vas da popunite sva polja.");
@@ -29,7 +31,17 @@ function RegisterPage() {
 
             navigate("/homepage");
         } catch (err: any) {
-            alert(err);
+            if (err.response?.status === 403) {
+                setErrorMessage(
+                    "Ovaj email se već koristi. Registrirajte se s drugim mailom."
+                );
+            } else {
+                setErrorMessage(
+                    err.response?.data?.message ||
+                    err.message ||
+                    "Dogodila se pogreška pri registraciji. Pokušajte ponovno."
+                );
+            }
         }
     };
 
@@ -45,6 +57,17 @@ function RegisterPage() {
                 </div>
 
                 <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
+
+                    {errorMessage && (
+                        <div
+                            className="mb-4 rounded-lg border border-red-300 bg-red-50 px-4 py-3 text-red-700"
+                            role="alert"
+                        >
+                            <strong className="font-semibold">Greška: </strong>
+                            <span className="block sm:inline">{errorMessage}</span>
+                        </div>
+                    )}
+
                     <form onSubmit={handleSubmit} className="space-y-6">
                         <div>
                             <label htmlFor="firstName" className="block text-sm font-medium leading-6 text-gray-900">
@@ -96,7 +119,11 @@ function RegisterPage() {
                                     autoComplete="off"
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
-                                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-orange-300 sm:text-sm sm:leading-6"
+                                    className={`block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm
+                                        ring-1 ring-inset ${errorMessage?.toLowerCase().includes("email")
+                                        ? "ring-red-500 focus:ring-red-500"
+                                        : "ring-gray-300 focus:ring-orange-300"}
+                                        placeholder:text-gray-400 sm:text-sm sm:leading-6`}
                                 />
                             </div>
                         </div>
