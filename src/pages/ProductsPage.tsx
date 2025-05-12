@@ -1,11 +1,19 @@
 import React, {useEffect, useRef, useState, useCallback} from 'react';
 import {Product, getProducts, createProduct, updateProduct} from "../services/ProductService";
 
+const CATEGORY_LABELS: Record<string, string> = {
+    USLUGA: "Usluga",
+    GRAĐEVINSKI_MATERIJAL: "Građevinski materijal",
+};
+
+
 const ProductsPage: React.FC = () => {
     const [products, setProducts] = useState<Product[]>([]);
     const [searchQuery, setSearchQuery] = useState<string>("");
     const [isAddModalOpen, setIsAddModalOpen] = useState<boolean>(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
+    const [addErrorMessage, setAddErrorMessage] = useState<string | null>(null);
+    const [editErrorMessage, setEditErrorMessage] = useState<string | null>(null);
 
     const [newProduct, setNewProduct] = useState<Omit<Product, "id">>({
         name: "",
@@ -39,8 +47,12 @@ const ProductsPage: React.FC = () => {
         product.category.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
-    const openAddModal = () => setIsAddModalOpen(true);
+    const openAddModal = () => {
+        setAddErrorMessage(null);
+        setIsAddModalOpen(true);
+    };
     const closeAddModal = () => {
+        setAddErrorMessage(null);
         setIsAddModalOpen(false);
         setNewProduct({name: '', category: '', price: 0, description: ''});
     };
@@ -63,18 +75,24 @@ const ProductsPage: React.FC = () => {
             setProducts(prev => [...prev, created]);
             closeAddModal();
         } catch (err: any) {
-            alert(err);
+            if (err.response?.status === 409) {
+                setAddErrorMessage("Ovaj proizvod već postoji. Unesite drugačiji naziv.");
+            } else {
+                setAddErrorMessage("Failed to add product. Please try again.");
+            }
         } finally {
             isSubmittingRef.current = false;
         }
     };
 
     const openEditModal = (product: Product) => {
+        setEditErrorMessage(null);
         setEditingProduct(product);
         setIsEditModalOpen(true);
     };
 
     const closeEditModal = () => {
+        setEditErrorMessage(null);
         setIsEditModalOpen(false);
         setEditingProduct(null);
     };
@@ -93,19 +111,27 @@ const ProductsPage: React.FC = () => {
         e.preventDefault();
         if (!editingProduct) return;
 
-        console.log("Updating product:", editingProduct);
-        const updatedProduct = await updateProduct(editingProduct.id, {
-            name: editingProduct.name,
-            category: editingProduct.category,
-            price: editingProduct.price,
-            description: editingProduct.description,
-        });
-
-        setProducts((prev) =>
-            prev.map((p) => (p.id === updatedProduct.id ? updatedProduct : p))
-        );
-
-        closeEditModal();
+        try {
+            const updatedProduct = await updateProduct(editingProduct.id, {
+                name: editingProduct.name,
+                category: editingProduct.category,
+                price: editingProduct.price,
+                description: editingProduct.description,
+            });
+            setProducts((prev) =>
+                prev.map((p) => p.id === updatedProduct.id ? updatedProduct : p)
+            );
+            closeEditModal();
+        } catch (err: any) {
+            const status = err.response?.status || err.status;
+            if (status === 409) {
+                setEditErrorMessage(
+                    "Ovaj proizvod već postoji. Unesite drugačiji naziv."
+                );
+            } else {
+                setEditErrorMessage("Spremanje nije uspjelo. Pokušajte ponovno.");
+            }
+        }
     };
 
     return (
@@ -145,7 +171,7 @@ const ProductsPage: React.FC = () => {
                     {filteredProducts.map((product) => (
                         <tr key={product.id}>
                             <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{product.name}</td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{product.category}</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{CATEGORY_LABELS[product.category] ?? product.category}</td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{product.price.toFixed(2)}</td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{product.description}</td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -180,13 +206,28 @@ const ProductsPage: React.FC = () => {
                               aria-hidden="true">&#8203;</span>
                         <div
                             className="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
+
+                            {addErrorMessage && (
+                                <div
+                                    className="mb-4 rounded-lg border border-red-300 bg-red-50 px-4 py-3 text-red-700"
+                                    role="alert"
+                                >
+                                    <strong className="font-semibold">Greška: </strong>
+                                    <span className="block sm:inline">{addErrorMessage}</span>
+                                </div>
+                            )}
+
                             <div>
                                 <div className="mt-3 text-center sm:mt-5">
                                     <h3 className="text-lg leading-6 font-medium text-gray-900" id="modal-title">
                                         Dodaj novi proizvod
                                     </h3>
                                     <div className="mt-2">
-                                        <form onSubmit={handleAddProduct}>
+                                        <form onSubmit={e => {
+                                            setAddErrorMessage(null);
+                                            handleAddProduct(e);
+                                        }}
+                                        >
                                             <div className="mb-4">
                                                 <label htmlFor="name"
                                                        className="block text-sm font-medium text-gray-700">
@@ -216,7 +257,9 @@ const ProductsPage: React.FC = () => {
                                                     className="mt-1 block w-full rounded-md border-gray-300 shadow-sm
                                                 ocus:border-orange-500 focus:ring-orange-500 sm:text-sm"
                                                 >
-                                                    <option value="">— odaberite —</option>
+                                                    <option value="" disabled className="text-gray-400">
+                                                        Odaberite kategoriju
+                                                    </option>
                                                     <option value="USLUGA">Usluga</option>
                                                     <option value="GRAĐEVINSKI_MATERIJAL">Građevinski materijal</option>
                                                 </select>
@@ -276,116 +319,131 @@ const ProductsPage: React.FC = () => {
                 </div>
             )}
 
-            {isEditModalOpen && editingProduct && (
-                <div className="fixed z-10 inset-0 overflow-y-auto">
-                    <div className="flex items-center justify-center min-h-screen px-4 text-center">
-                        <div
-                            className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
-                            aria-hidden="true"
-                        ></div>
-                        <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">
+            {
+                isEditModalOpen && editingProduct && (
+                    <div className="fixed z-10 inset-0 overflow-y-auto">
+                        <div className="flex items-center justify-center min-h-screen px-4 text-center">
+                            <div
+                                className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
+                                aria-hidden="true"
+                            ></div>
+                            <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">
               &#8203;
             </span>
-                        <div
-                            className="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
-                            <div>
-                                <div className="mt-3 text-center sm:mt-5">
-                                    <h3
-                                        className="text-lg leading-6 font-medium text-gray-900"
-                                        id="modal-title"
-                                    >
-                                        Uredi proizvod
-                                    </h3>
-                                    <div className="mt-2">
-                                        <form onSubmit={handleUpdateProduct}>
-                                            <div className="mb-4">
-                                                <label htmlFor="edit-name"
-                                                       className="block text-sm font-medium text-gray-700">
-                                                    Naziv
-                                                </label>
-                                                <input
-                                                    type="text"
-                                                    name="name"
-                                                    id="edit-name"
-                                                    value={editingProduct.name}
-                                                    onChange={handleEditInputChange}
-                                                    required
-                                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                                                />
+                            <div
+                                className="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
+                                <div>
+                                    <div className="mt-3 text-center sm:mt-5">
+                                        <h3
+                                            className="text-lg leading-6 font-medium text-gray-900"
+                                            id="modal-title"
+                                        >
+                                            Uredi proizvod
+                                        </h3>
+
+                                        {editErrorMessage && (
+                                            <div
+                                                className="mt-3 mb-4 rounded-lg border border-red-300 bg-red-50 px-4 py-3 text-red-700"
+                                                role="alert"
+                                            >
+                                                <strong className="font-semibold">Greška: </strong>
+                                                <span className="block sm:inline">{editErrorMessage}</span>
                                             </div>
-                                            <div className="mb-4">
-                                                <label htmlFor="category"
-                                                       className="block text-sm font-medium text-gray-700">
-                                                    Kategorija
-                                                </label>
-                                                <select
-                                                    name="category"
-                                                    id="category"
-                                                    value={editingProduct.category}
-                                                    onChange={handleEditInputChange}
-                                                    required
-                                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm
+                                        )}
+
+                                        <div className="mt-2">
+                                            <form onSubmit={handleUpdateProduct}>
+                                                <div className="mb-4">
+                                                    <label htmlFor="edit-name"
+                                                           className="block text-sm font-medium text-gray-700">
+                                                        Naziv
+                                                    </label>
+                                                    <input
+                                                        type="text"
+                                                        name="name"
+                                                        id="edit-name"
+                                                        value={editingProduct.name}
+                                                        onChange={handleEditInputChange}
+                                                        required
+                                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                                                    />
+                                                </div>
+                                                <div className="mb-4">
+                                                    <label htmlFor="category"
+                                                           className="block text-sm font-medium text-gray-700">
+                                                        Kategorija
+                                                    </label>
+                                                    <select
+                                                        name="category"
+                                                        id="category"
+                                                        value={editingProduct.category}
+                                                        onChange={handleEditInputChange}
+                                                        required
+                                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm
                                                 ocus:border-orange-500 focus:ring-orange-500 sm:text-sm"
-                                                >
-                                                    <option value="">— odaberite —</option>
-                                                    <option value="USLUGA">Usluga</option>
-                                                    <option value="GRAĐEVINSKI_MATERIJAL">Građevinski materijal</option>
-                                                </select>
-                                            </div>
-                                            <div className="mb-4">
-                                                <label htmlFor="edit-price"
-                                                       className="block text-sm font-medium text-gray-700">
-                                                    Cijena (€)
-                                                </label>
-                                                <input
-                                                    type="number"
-                                                    name="price"
-                                                    id="edit-price"
-                                                    value={editingProduct.price}
-                                                    onChange={handleEditInputChange}
-                                                    required
-                                                    min="0"
-                                                    step="0.01"
-                                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                                                />
-                                            </div>
-                                            <div className="mb-4">
-                                                <label htmlFor="edit-description"
-                                                       className="block text-sm font-medium text-gray-700">
-                                                    Opis
-                                                </label>
-                                                <textarea
-                                                    name="description"
-                                                    id="edit-description"
-                                                    value={editingProduct.description}
-                                                    onChange={handleEditInputChange}
-                                                    required
-                                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                                                ></textarea>
-                                            </div>
-                                            <div className="mt-5 sm:mt-6 sm:flex sm:flex-row-reverse">
-                                                <button
-                                                    type="submit"
-                                                    className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-orange-600 text-base font-medium text-white hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 sm:ml-3 sm:w-auto sm:text-sm"
-                                                >
-                                                    Spremi promjene
-                                                </button>
-                                                <button
-                                                    type="button"
-                                                    onClick={closeEditModal}
-                                                    className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:w-auto sm:text-sm"
-                                                >
-                                                    Odustani
-                                                </button>
-                                            </div>
-                                        </form>
+                                                    >
+                                                        <option value="" disabled className="text-gray-400">
+                                                            Odaberite kategoriju
+                                                        </option>
+                                                        <option value="USLUGA">Usluga</option>
+                                                        <option value="GRAĐEVINSKI_MATERIJAL">Građevinski materijal
+                                                        </option>
+                                                    </select>
+                                                </div>
+                                                <div className="mb-4">
+                                                    <label htmlFor="edit-price"
+                                                           className="block text-sm font-medium text-gray-700">
+                                                        Cijena (€)
+                                                    </label>
+                                                    <input
+                                                        type="number"
+                                                        name="price"
+                                                        id="edit-price"
+                                                        value={editingProduct.price}
+                                                        onChange={handleEditInputChange}
+                                                        required
+                                                        min="0"
+                                                        step="0.01"
+                                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                                                    />
+                                                </div>
+                                                <div className="mb-4">
+                                                    <label htmlFor="edit-description"
+                                                           className="block text-sm font-medium text-gray-700">
+                                                        Opis
+                                                    </label>
+                                                    <textarea
+                                                        name="description"
+                                                        id="edit-description"
+                                                        value={editingProduct.description}
+                                                        onChange={handleEditInputChange}
+                                                        required
+                                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                                                    ></textarea>
+                                                </div>
+                                                <div className="mt-5 sm:mt-6 sm:flex sm:flex-row-reverse">
+                                                    <button
+                                                        type="submit"
+                                                        className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-orange-600 text-base font-medium text-white hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 sm:ml-3 sm:w-auto sm:text-sm"
+                                                    >
+                                                        Spremi promjene
+                                                    </button>
+                                                    <button
+                                                        type="button"
+                                                        onClick={closeEditModal}
+                                                        className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:w-auto sm:text-sm"
+                                                    >
+                                                        Odustani
+                                                    </button>
+                                                </div>
+                                            </form>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            )}
+                )}
 
         </div>
     );
