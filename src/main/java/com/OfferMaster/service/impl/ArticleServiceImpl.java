@@ -12,6 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.List;
+
 @Service
 public class ArticleServiceImpl implements ArticleService {
 
@@ -37,6 +39,13 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Override
     public ArticleDto createArticle(ArticleRequestDto articleRequestDto) {
+        List<Article> matches = articleRepository.findByNameIgnoreCase(articleRequestDto.getName());
+        if (!matches.isEmpty()) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "This item already exists. Please choose a different name."
+            );
+        }
         Article article = new Article();
         article.setName(articleRequestDto.getName());
         article.setDescription(articleRequestDto.getDescription());
@@ -52,6 +61,16 @@ public class ArticleServiceImpl implements ArticleService {
     public ArticleDto updateArticle(Long articleId, ArticleRequestDto articleRequestDto) {
         Article article = articleRepository.findById(articleId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Article not found with id " + articleId));
+
+        List<Article> matches = articleRepository.findByNameIgnoreCase(articleRequestDto.getName());
+        boolean nameTakenByOther = matches.stream()
+                .anyMatch(a -> !a.getArticleId().equals(articleId));
+        if (nameTakenByOther) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "This item already exists. Please choose a different name."
+            );
+        }
 
         article.setName(articleRequestDto.getName());
         article.setCategory(articleRequestDto.getCategory());
