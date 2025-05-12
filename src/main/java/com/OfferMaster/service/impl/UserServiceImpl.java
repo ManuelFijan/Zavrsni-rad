@@ -73,6 +73,15 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findByEmail(currentEmail)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found with email " + currentEmail));
 
+        userRepository.findByEmailIgnoreCase(profileUpdateDto.getEmail())
+                .filter(u -> !u.getUserId().equals(user.getUserId()))
+                .ifPresent(u -> {
+                    throw new ResponseStatusException(
+                            HttpStatus.CONFLICT,
+                            "This email is already registered. Please use a different email."
+                    );
+                });
+
         user.setFirstName(profileUpdateDto.getFirstName());
         user.setLastName(profileUpdateDto.getLastName());
         user.setEmail(profileUpdateDto.getEmail());
@@ -80,5 +89,17 @@ public class UserServiceImpl implements UserService {
 
         User updatedUser = userRepository.save(user);
         return userMapper.toDto(updatedUser);
+    }
+
+    @Override
+    public UserDto getCurrentUserProfile() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String email = auth.getName();
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "User not found with email " + email
+                ));
+        return userMapper.toDto(user);
     }
 }

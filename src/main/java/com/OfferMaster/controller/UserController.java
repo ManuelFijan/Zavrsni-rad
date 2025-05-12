@@ -39,4 +39,10 @@ public class UserController {
         UserDto updatedUser = userService.updateUserProfile(profileUpdateDto);
         return ResponseEntity.ok(updatedUser);
     }
+
+    @GetMapping("/profile")
+    public ResponseEntity<UserDto> getCurrentProfile() {
+        UserDto dto = userService.getCurrentUserProfile();
+        return ResponseEntity.ok(dto);
+    }
 }
