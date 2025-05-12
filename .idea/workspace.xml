@@ -4,9 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3694cb8b-40c4-4407-bcc1-59c645812f6b" name="Changes" comment="provjera da se mail već ne koristi prilikom registracije">
+    <list default="true" id="3694cb8b-40c4-4407-bcc1-59c645812f6b" name="Changes" comment="ispravci/poboljšanje dodavanja i uređivanja arikala u bazi">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/pages/ProductsPage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/ProductsPage.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/ProfilePage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/ProfilePage.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/services/UserService.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/services/UserService.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -140,7 +141,7 @@
       <workItem from="1744847131039" duration="593000" />
       <workItem from="1744868560154" duration="8608000" />
       <workItem from="1744907003350" duration="25000" />
-      <workItem from="1747041752909" duration="6448000" />
+      <workItem from="1747041752909" duration="7672000" />
     </task>
     <task id="LOCAL-00001" summary="inicijalni commit">
       <option name="closed" value="true" />
@@ -222,7 +223,15 @@
       <option name="project" value="LOCAL" />
       <updated>1747063782007</updated>
     </task>
-    <option name="localTasksCounter" value="11" />
+    <task id="LOCAL-00011" summary="ispravci/poboljšanje dodavanja i uređivanja arikala u bazi">
+      <option name="closed" value="true" />
+      <created>1747083670998</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1747083670998</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -250,6 +259,7 @@
     <MESSAGE value="povezivanje funkcije ažuriranja profila" />
     <MESSAGE value="povezivanje funkcija dodavanja, uređivanja i pretraživanja artikala u bazi" />
     <MESSAGE value="provjera da se mail već ne koristi prilikom registracije" />
-    <option name="LAST_COMMIT_MESSAGE" value="provjera da se mail već ne koristi prilikom registracije" />
+    <MESSAGE value="ispravci/poboljšanje dodavanja i uređivanja arikala u bazi" />
+    <option name="LAST_COMMIT_MESSAGE" value="ispravci/poboljšanje dodavanja i uređivanja arikala u bazi" />
   </component>
 </project>

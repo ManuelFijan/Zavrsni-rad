@@ -20,3 +20,12 @@ export async function updateUserProfile(profile: {
     );
     return response.data;
 }
+
+export async function getUserProfile(): Promise<UserDto> {
+    const token = localStorage.getItem("accessToken");
+    const response = await apiClient.get<UserDto>(
+        "/api/auth/profile",
+        { headers: { Authorization: `Bearer ${token}` } }
+    );
+    return response.data;
+}
