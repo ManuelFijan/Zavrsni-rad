@@ -40,7 +40,10 @@ public class UserServiceImpl implements UserService {
     public UserDto registerUser(UserRegistrationDto registrationDto) {
         Optional<User> existingUser = userRepository.findByEmail(registrationDto.getEmail());
         if (existingUser.isPresent()) {
-            throw new RuntimeException("User with email " + registrationDto.getEmail() + " already exists.");
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "This email is already registered. Please log in or use a different email."
+            );
         }
         User user = userMapper.toEntity(registrationDto);
         user.setPasswordHash(passwordEncoder.encode(registrationDto.getPassword()));
