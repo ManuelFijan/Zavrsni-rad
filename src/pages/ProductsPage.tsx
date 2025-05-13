@@ -1,15 +1,20 @@
-import React, {useEffect, useRef, useState, useCallback} from 'react';
+import React, {useEffect, useState, useCallback} from 'react';
 import {Product, getProducts, createProduct, updateProduct} from "../services/ProductService";
+import {ChevronLeftIcon, ChevronRightIcon} from "@heroicons/react/20/solid";
 
 const CATEGORY_LABELS: Record<string, string> = {
     USLUGA: "Usluga",
     GRAĐEVINSKI_MATERIJAL: "Građevinski materijal",
 };
 
+const PAGE_SIZE = 20;
 
 const ProductsPage: React.FC = () => {
     const [products, setProducts] = useState<Product[]>([]);
     const [searchQuery, setSearchQuery] = useState<string>("");
+    const [currentPage, setCurrentPage] = useState<number>(0);
+    const [totalPages, setTotalPages] = useState<number>(1);
+
     const [isAddModalOpen, setIsAddModalOpen] = useState<boolean>(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
     const [addErrorMessage, setAddErrorMessage] = useState<string | null>(null);
@@ -24,28 +29,22 @@ const ProductsPage: React.FC = () => {
 
     const [editingProduct, setEditingProduct] = useState<Product | null>(null);
 
-    const didFetchRef = useRef(false);
     useEffect(() => {
-        if (didFetchRef.current) return;
-        didFetchRef.current = true;
         (async () => {
             try {
-                const fetchedPage = await getProducts();
-                setProducts(fetchedPage.content);
+                const pageData = await getProducts(currentPage, PAGE_SIZE, searchQuery);
+                setProducts(pageData.content);
+                setTotalPages(pageData.totalPages);
             } catch (err) {
                 console.error("Failed to fetch products:", err);
             }
         })();
-    }, []);
+    }, [currentPage, searchQuery]);
 
     const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
         setSearchQuery(e.target.value);
+        setCurrentPage(0);
     }, []);
-
-    const filteredProducts = products.filter((product) =>
-        product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        product.category.toLowerCase().includes(searchQuery.toLowerCase())
-    );
 
     const openAddModal = () => {
         setAddErrorMessage(null);
@@ -65,23 +64,18 @@ const ProductsPage: React.FC = () => {
         }));
     };
 
-    const isSubmittingRef = useRef(false);
     const handleAddProduct = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (isSubmittingRef.current) return;
-        isSubmittingRef.current = true;
         try {
-            const created = await createProduct(newProduct);
-            setProducts(prev => [...prev, created]);
+            await createProduct(newProduct);
+            setCurrentPage(0);
             closeAddModal();
         } catch (err: any) {
             if (err.response?.status === 409) {
                 setAddErrorMessage("Ovaj proizvod već postoji. Unesite drugačiji naziv.");
             } else {
-                setAddErrorMessage("Failed to add product. Please try again.");
+                setAddErrorMessage("Spremanje nije uspjelo. Pokušajte ponovno.");
             }
-        } finally {
-            isSubmittingRef.current = false;
         }
     };
 
@@ -110,29 +104,27 @@ const ProductsPage: React.FC = () => {
     const handleUpdateProduct = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!editingProduct) return;
-
         try {
-            const updatedProduct = await updateProduct(editingProduct.id, {
+            await updateProduct(editingProduct.id, {
                 name: editingProduct.name,
                 category: editingProduct.category,
                 price: editingProduct.price,
                 description: editingProduct.description,
             });
-            setProducts((prev) =>
-                prev.map((p) => p.id === updatedProduct.id ? updatedProduct : p)
-            );
+            setCurrentPage(0);
             closeEditModal();
         } catch (err: any) {
-            const status = err.response?.status || err.status;
+            const status = err.response?.status;
             if (status === 409) {
-                setEditErrorMessage(
-                    "Ovaj proizvod već postoji. Unesite drugačiji naziv."
-                );
+                setEditErrorMessage("Ovaj proizvod već postoji. Unesite drugačiji naziv.");
             } else {
                 setEditErrorMessage("Spremanje nije uspjelo. Pokušajte ponovno.");
             }
         }
     };
+
+    const prevPage = () => setCurrentPage(p => Math.max(p - 1, 0));
+    const nextPage = () => setCurrentPage(p => Math.min(p + 1, totalPages - 1));
 
     return (
         <div className="bg-white shadow rounded-lg p-6">
@@ -154,6 +146,26 @@ const ProductsPage: React.FC = () => {
                 </button>
             </div>
 
+            <div className="flex justify-center items-center mb-4">
+                <button
+                    onClick={prevPage}
+                    disabled={currentPage === 0}
+                    className="p-2 rounded-full hover:bg-gray-100 disabled:opacity-50"
+                >
+                    <ChevronLeftIcon className="w-6 h-6 text-gray-600"/>
+                </button>
+                <span className="mx-2 text-sm text-gray-600">
+                        {currentPage + 1} / {totalPages}
+                </span>
+                <button
+                    onClick={nextPage}
+                    disabled={currentPage >= totalPages - 1}
+                    className="p-2 rounded-full hover:bg-gray-100 disabled:opacity-50"
+                >
+                    <ChevronRightIcon className="w-6 h-6 text-gray-600"/>
+                </button>
+            </div>
+
             <div className="overflow-x-auto">
                 <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">
@@ -168,7 +180,7 @@ const ProductsPage: React.FC = () => {
                     </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
-                    {filteredProducts.map((product) => (
+                    {products.map((product) => (
                         <tr key={product.id}>
                             <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{product.name}</td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{CATEGORY_LABELS[product.category] ?? product.category}</td>
@@ -184,7 +196,7 @@ const ProductsPage: React.FC = () => {
                             </td>
                         </tr>
                     ))}
-                    {filteredProducts.length === 0 && (
+                    {products.length === 0 && (
                         <tr>
                             <td colSpan={5} className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">
                                 Nema pronađenih proizvoda.
@@ -193,6 +205,26 @@ const ProductsPage: React.FC = () => {
                     )}
                     </tbody>
                 </table>
+            </div>
+
+            <div className="flex justify-center items-center mb-4">
+                <button
+                    onClick={prevPage}
+                    disabled={currentPage === 0}
+                    className="p-2 rounded-full hover:bg-gray-100 disabled:opacity-50"
+                >
+                    <ChevronLeftIcon className="w-6 h-6 text-gray-600"/>
+                </button>
+                <span className="mx-2 text-sm text-gray-600">
+                     {currentPage + 1} / {totalPages}
+                </span>
+                <button
+                    onClick={nextPage}
+                    disabled={currentPage >= totalPages - 1}
+                    className="p-2 rounded-full hover:bg-gray-100 disabled:opacity-50"
+                >
+                    <ChevronRightIcon className="w-6 h-6 text-gray-600"/>
+                </button>
             </div>
 
             {isAddModalOpen && (
