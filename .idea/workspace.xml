@@ -4,10 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3694cb8b-40c4-4407-bcc1-59c645812f6b" name="Changes" comment="ispravci/poboljšanje dodavanja i uređivanja arikala u bazi">
+    <list default="true" id="3694cb8b-40c4-4407-bcc1-59c645812f6b" name="Changes" comment="poboljšanje pretrage i dohvaćanja proizvoda iz baze">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/pages/ProfilePage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/ProfilePage.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/services/UserService.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/services/UserService.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/QuotesPage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/QuotesPage.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/services/QuoteService.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/services/QuoteService.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -141,7 +141,8 @@
       <workItem from="1744847131039" duration="593000" />
       <workItem from="1744868560154" duration="8608000" />
       <workItem from="1744907003350" duration="25000" />
-      <workItem from="1747041752909" duration="7672000" />
+      <workItem from="1747041752909" duration="7971000" />
+      <workItem from="1747134732211" duration="11464000" />
     </task>
     <task id="LOCAL-00001" summary="inicijalni commit">
       <option name="closed" value="true" />
@@ -231,7 +232,23 @@
       <option name="project" value="LOCAL" />
       <updated>1747083670998</updated>
     </task>
-    <option name="localTasksCounter" value="12" />
+    <task id="LOCAL-00012" summary="dodavanje poruke kod ažuriranja profila">
+      <option name="closed" value="true" />
+      <created>1747084968554</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1747084968554</updated>
+    </task>
+    <task id="LOCAL-00013" summary="poboljšanje pretrage i dohvaćanja proizvoda iz baze">
+      <option name="closed" value="true" />
+      <created>1747158562526</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1747158562526</updated>
+    </task>
+    <option name="localTasksCounter" value="14" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -260,6 +277,8 @@
     <MESSAGE value="povezivanje funkcija dodavanja, uređivanja i pretraživanja artikala u bazi" />
     <MESSAGE value="provjera da se mail već ne koristi prilikom registracije" />
     <MESSAGE value="ispravci/poboljšanje dodavanja i uređivanja arikala u bazi" />
-    <option name="LAST_COMMIT_MESSAGE" value="ispravci/poboljšanje dodavanja i uređivanja arikala u bazi" />
+    <MESSAGE value="dodavanje poruke kod ažuriranja profila" />
+    <MESSAGE value="poboljšanje pretrage i dohvaćanja proizvoda iz baze" />
+    <option name="LAST_COMMIT_MESSAGE" value="poboljšanje pretrage i dohvaćanja proizvoda iz baze" />
   </component>
 </project>

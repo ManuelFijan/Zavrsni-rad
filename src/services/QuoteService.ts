@@ -1,4 +1,4 @@
-import { Product } from "./ProductService";
+import apiClient from "./axiosConfig";
 
 export interface QuoteItem {
     productId: number;
@@ -8,41 +8,41 @@ export interface QuoteItem {
 export interface Quote {
     id: number;
     items: QuoteItem[];
-    folder: string;
-    createdAt: Date;
+    createdAt: string;
+    logoUrl?: string;
+    folderId?: number;
 }
-
-let quotesDb: Quote[] = [];
-// help array
-let helpQuotes: Quote[] = [];
-
-let nextQuoteId = 1;
 
 export async function getQuotes(): Promise<Quote[]> {
-    return new Promise((resolve) => {
-        setTimeout(() => {
-            resolve([...helpQuotes]);
-        }, 300);
-    });
+    const {data} = await apiClient.get<Quote[]>("/api/quotes");
+    return data;
 }
 
-export async function createQuote(items: QuoteItem[], folder: string): Promise<Quote> {
-    return new Promise((resolve, reject) => {
-        setTimeout(() => {
-            if (!items || items.length === 0) {
-                reject("Ne možete kreirati praznu ponudu.");
-                return;
-            }
-            const newQuote: Quote = {
-                id: nextQuoteId++, // increment the counter each time
-                items,
-                folder,
-                createdAt: new Date(),
-            };
+export async function createQuote(
+    items: QuoteItem[],
+    logoBase64: string | null
+): Promise<number> {
+    const dtoItems = items.map(i => ({
+        articleId: i.productId,
+        quantity: i.quantity
+    }));
 
-            helpQuotes.push(newQuote);
+    const {data: newQuoteId} = await apiClient.post<number>(
+        "/api/quotes",
+        {items: dtoItems, logoBase64}
+    );
 
-            resolve(newQuote);
-        }, 300);
+    return newQuoteId;
+}
+
+export async function downloadQuotePdf(quoteId: number): Promise<Blob> {
+    const resp = await apiClient.get(`/api/quotes/${quoteId}/pdf`, {
+        responseType: "blob",
     });
+    return resp.data;
+}
+
+export async function getQuote(id: number): Promise<Quote> {
+    const { data } = await apiClient.get<Quote>(`/api/quotes/${id}`);
+    return data;
 }

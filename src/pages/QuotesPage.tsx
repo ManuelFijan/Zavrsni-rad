@@ -1,11 +1,13 @@
 import React, {useEffect, useRef, useState} from "react";
-import { OPEN_SANS_REGULAR } from "../fonts/OpenSans.js";
-import { getProducts, Product } from "../services/ProductService";
+import {OPEN_SANS_REGULAR} from "../fonts/OpenSans.js";
+import {getProducts, Product} from "../services/ProductService";
 import {
     getQuotes,
     createQuote,
     Quote,
-    QuoteItem
+    QuoteItem,
+    getQuote,
+    downloadQuotePdf
 } from "../services/QuoteService";
 import {
     getFolders,
@@ -29,7 +31,25 @@ const QuotesPage: React.FC = () => {
     const [searchTerm, setSearchTerm] = useState<string>("");
     const [logoDataURL, setLogoDataURL] = useState<string | null>(null);
 
-    // on opening, fetch products, quotes, folders
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
+    const [folderFilter, setFolderFilter] = useState<"all" | "none" | string>("all");
+
+    const folderlessQuotes = quotes.filter(
+        (q) => !folders.some((f) => f.quoteIds.includes(q.id))
+    );
+
+    const displayedQuotes = React.useMemo(() => {
+        if (folderFilter === "all") return quotes;
+        if (folderFilter === "none") return folderlessQuotes;
+        const fid = parseInt(folderFilter, 10);
+        const folder = folders.find((f) => f.id === fid);
+        return folder
+            ? quotes.filter((q) => folder.quoteIds.includes(q.id))
+            : [];
+    }, [folderFilter, quotes, folders]);
+
+
     useEffect(() => {
         (async () => {
             try {
@@ -71,10 +91,10 @@ const QuotesPage: React.FC = () => {
                 const existing = prev.find((i) => i.productId === productId);
                 if (existing) {
                     return prev.map((item) =>
-                        item.productId === productId ? { ...item, quantity: qty } : item
+                        item.productId === productId ? {...item, quantity: qty} : item
                     );
                 }
-                return [...prev, { productId, quantity: qty }];
+                return [...prev, {productId, quantity: qty}];
             });
         }
     };
@@ -88,7 +108,7 @@ const QuotesPage: React.FC = () => {
         } else {
             setSelectedItems((prev) =>
                 prev.map((i) =>
-                    i.productId === productId ? { ...i, quantity: newQty } : i
+                    i.productId === productId ? {...i, quantity: newQty} : i
                 )
             );
         }
@@ -97,11 +117,11 @@ const QuotesPage: React.FC = () => {
     const handleIncrement = (productId: number) => {
         const found = selectedItems.find((i) => i.productId === productId);
         if (!found) {
-            setSelectedItems((prev) => [...prev, { productId, quantity: 1 }]);
+            setSelectedItems((prev) => [...prev, {productId, quantity: 1}]);
         } else {
             setSelectedItems((prev) =>
                 prev.map((i) =>
-                    i.productId === productId ? { ...i, quantity: i.quantity + 1 } : i
+                    i.productId === productId ? {...i, quantity: i.quantity + 1} : i
                 )
             );
         }
@@ -148,25 +168,35 @@ const QuotesPage: React.FC = () => {
     const handleCreateQuote = async () => {
         if (isSubmittingRef.current) return;
         isSubmittingRef.current = true;
+
         try {
-            const nonZeroItems = selectedItems.filter((i) => i.quantity > 0);
-            if (nonZeroItems.length === 0) {
+            const nonZero = selectedItems.filter(i => i.quantity > 0);
+            if (nonZero.length === 0) {
                 alert("Dodajte barem jedan proizvod.");
                 return;
             }
-            const newQuote = await createQuote(nonZeroItems, "");
-            setQuotes((prev) => [...prev, newQuote]);
 
-            // if a folder is selected, add quote to it
+            const newQuoteId = await createQuote(nonZero, logoDataURL);
+
+            const freshQuote = await getQuote(newQuoteId);
+
+            setQuotes(prev => [...prev, freshQuote]);
+
             if (selectedFolderId) {
-                await addQuoteToFolder(selectedFolderId, newQuote.id);
+                await addQuoteToFolder(selectedFolderId, freshQuote.id);
             }
-            // reset
+
+            const pdfBlob = await downloadQuotePdf(freshQuote.id);
+            const blobUrl = URL.createObjectURL(pdfBlob);
+            window.open(blobUrl, "_blank");
+
             setSelectedItems([]);
             setSelectedFolderId(null);
-            alert(`Ponuda kreirana (ID: ${newQuote.id})!`);
+            setLogoDataURL(null);
+
         } catch (err: any) {
-            alert(err);
+            console.error(err);
+            alert("Greška pri kreiranju ponude: " + err.message);
         } finally {
             isSubmittingRef.current = false;
         }
@@ -214,209 +244,232 @@ const QuotesPage: React.FC = () => {
         doc.save("ponuda.pdf");
     };
 
-    // folderless quotes
-    const folderlessQuotes = quotes.filter(
-        (q) => !folders.some((f) => f.quoteIds.includes(q.id))
-    );
-
     return (
-        <div className="min-h-screen bg-white shadow rounded-lg p-6">
-            <h1 className="text-2xl font-semibold mb-4">Izrada Ponuda</h1>
 
-            {/* logo upload */}
-            <div className="mb-4 flex items-center gap-2">
-                <label className="font-medium">Logo (opcionalno):</label>
-                <input type="file" accept="image/*" onChange={handleLogoChange} />
+
+        <div className="min-h-screen bg-gray-50 p-6">
+
+            <div className="flex items-center justify-between mb-6">
+                <h1 className="text-2xl font-semibold">Izrada Ponuda</h1>
+                <button
+                    onClick={() => setIsModalOpen(true)}
+                    className="inline-flex items-center space-x-2 rounded bg-orange-600 px-4 py-2 text-white hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                >
+
+                    <svg
+                        className="h-5 w-5"
+                        fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                    >
+                        <path
+                            strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                            d="M12 4v16m8-8H4"
+                        />
+                    </svg>
+                    <span>Kreiraj novu ponudu</span>
+                </button>
             </div>
 
-            {/* product search */}
-            <div className="mb-4">
-                <input
-                    type="text"
-                    placeholder="Traži proizvod..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="border p-2 rounded w-64"
-                />
-            </div>
 
-            {/* filtered products + quantity stepper */}
-            {filteredProducts.length > 0 && (
-                <div className="mb-4 border p-3 rounded">
-                    <h2 className="font-medium mb-2">Pronađeni proizvodi:</h2>
-                    {filteredProducts.map((p) => {
-                        const qtyStr = getQuantityString(p.id);
-                        const numericQty = qtyStr === "" ? 0 : parseInt(qtyStr, 10);
+            {isModalOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+                    <div className="relative w-full max-w-2xl rounded-lg bg-white p-6 shadow-xl">
+                        <button
+                            onClick={() => setIsModalOpen(false)}
+                            className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+                        >
+                            <span className="sr-only">Zatvori</span>
+                            ✕
+                        </button>
 
-                        return (
-                            <div key={p.id} className="flex items-center gap-2 mb-2">
-                                <span className="w-40">{p.name}</span>
-                                <button
-                                    className="bg-gray-200 hover:bg-gray-300 rounded px-2"
-                                    onClick={() => handleDecrement(p.id)}
-                                >
-                                    –
-                                </button>
+                        <h2 className="text-xl font-bold mb-4">Kreiranje nove ponude</h2>
+
+                        <div className="space-y-4 overflow-y-auto max-h-[70vh]">
+                            <div className="flex items-center gap-3">
+                                <label className="font-medium">Logo (opc.):</label>
+                                <input type="file" accept="image/*" onChange={handleLogoChange}/>
+                            </div>
+
+                            <div>
                                 <input
                                     type="text"
-                                    value={qtyStr}
-                                    onChange={(e) => handleQuantityInput(p.id, e.target.value)}
-                                    className="border w-16 text-center"
+                                    placeholder="Traži proizvod..."
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    className="w-full rounded border px-3 py-2 shadow-sm focus:border-orange-500 focus:ring-1 focus:ring-orange-300"
+                                />
+                                {filteredProducts.length > 0 && (
+                                    <div className="mt-2 rounded border bg-white p-3 shadow-inner">
+                                        {filteredProducts.map((p) => {
+                                            const qtyStr = getQuantityString(p.id);
+                                            return (
+                                                <div
+                                                    key={p.id}
+                                                    className="mb-2 flex items-center justify-between"
+                                                >
+                                                    <span className="font-medium">{p.name}</span>
+                                                    <div className="flex items-center space-x-1">
+                                                        <button
+                                                            onClick={() => handleDecrement(p.id)}
+                                                            className="rounded bg-gray-200 px-2 py-1 hover:bg-gray-300"
+                                                        >
+                                                            –
+                                                        </button>
+                                                        <input
+                                                            type="text"
+                                                            value={qtyStr}
+                                                            onChange={(e) => handleQuantityInput(p.id, e.target.value)}
+                                                            className="w-12 rounded border px-1 text-center"
+                                                        />
+                                                        <button
+                                                            onClick={() => handleIncrement(p.id)}
+                                                            className="rounded bg-gray-200 px-2 py-1 hover:bg-gray-300"
+                                                        >
+                                                            +
+                                                        </button>
+                                                    </div>
+                                                    <span className="text-sm text-gray-600">
+                                                          {(p.price * (parseInt(qtyStr) || 0)).toFixed(2)} €
+                                                    </span>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                )}
+
+                                {selectedItems.length > 0 && (
+                                    <div className="border-t pt-4">
+                                        <h3 className="text-sm font-medium text-gray-700 mb-2">Pregled artikala</h3>
+                                        <ul className="max-h-40 overflow-y-auto space-y-2">
+                                            {selectedItems.map((item) => {
+                                                const prod = products.find((p) => p.id === item.productId);
+                                                if (!prod) return null;
+                                                return (
+                                                    <li
+                                                        key={item.productId}
+                                                        className="flex justify-between items-center text-sm text-gray-800"
+                                                    >
+                                                        <div>
+                                                            <span className="font-medium">{prod.name}</span>{" "}
+                                                            <span className="text-gray-500">× {item.quantity}</span>
+                                                        </div>
+                                                        <div className="font-medium">
+                                                            {(prod.price * item.quantity).toFixed(2)} €
+                                                        </div>
+                                                    </li>
+                                                );
+                                            })}
+                                        </ul>
+                                    </div>
+                                )}
+                            </div>
+
+                            <div className="flex items-center space-x-2">
+                                <select
+                                    value={selectedFolderId ?? ""}
+                                    onChange={(e) => {
+                                        const v = parseInt(e.target.value);
+                                        setSelectedFolderId(isNaN(v) ? null : v);
+                                    }}
+                                    className="flex-1 rounded border px-2 py-1 shadow-sm focus:border-orange-500 focus:ring-orange-300"
+                                >
+                                    <option value="">(Bez foldera)</option>
+                                    {folders.map((f) => (
+                                        <option key={f.id} value={f.id}>{f.name}</option>
+                                    ))}
+                                </select>
+                                <input
+                                    type="text"
+                                    value={newFolderName}
+                                    onChange={(e) => setNewFolderName(e.target.value)}
+                                    placeholder="Novi folder"
+                                    className="w-40 rounded border px-2 py-1 shadow-sm"
                                 />
                                 <button
-                                    className="bg-gray-200 hover:bg-gray-300 rounded px-2"
-                                    onClick={() => handleIncrement(p.id)}
+                                    onClick={handleCreateFolder}
+                                    className="rounded bg-orange-600 px-3 py-1 text-white hover:bg-orange-700"
                                 >
                                     +
                                 </button>
-                                <span>{(p.price * numericQty).toFixed(2)} €</span>
                             </div>
-                        );
-                    })}
+
+                            <div className="rounded border bg-gray-50 p-3 text-sm">
+                                <p>Ukupno artikala: {selectedItems.reduce((sum, i) => sum + i.quantity, 0)}</p>
+                                <p>Ukupna cijena: {getTotal().toFixed(2)} €</p>
+                            </div>
+                        </div>
+
+                        <div className="mt-6 flex justify-end space-x-3">
+                            <button
+                                onClick={() => setIsModalOpen(false)}
+                                className="rounded bg-gray-200 px-4 py-2 hover:bg-gray-300"
+                            >
+                                Odustani
+                            </button>
+                            <button
+                                onClick={handleCreateQuote}
+                                className="rounded bg-orange-600 px-4 py-2 text-white hover:bg-orange-700"
+                            >
+                                Kreiraj ponudu
+                            </button>
+                            <button
+                                onClick={handleGeneratePdf}
+                                className="rounded bg-orange-600 px-4 py-2 text-white hover:bg-orange-700"
+                            >
+                                Preuzmi PDF
+                            </button>
+                        </div>
+                    </div>
                 </div>
             )}
 
-            {/* folder picking/creation */}
-            <div className="flex items-center gap-2 mb-4 border p-3 rounded">
-                <label className="font-medium">Folder:</label>
+            <div className="mb-6 flex items-center space-x-4">
+                <label htmlFor="folderFilter" className="text-sm font-medium text-gray-700">
+                    Prikaži ponude iz:
+                </label>
                 <select
-                    value={selectedFolderId ?? ""}
-                    onChange={(e) => {
-                        const val = parseInt(e.target.value, 10);
-                        setSelectedFolderId(isNaN(val) ? null : val);
-                    }}
-                    className="border p-1 rounded"
+                    id="folderFilter"
+                    value={folderFilter}
+                    onChange={(e) => setFolderFilter(e.target.value)}
+                    className="rounded-md border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500 sm:text-sm"
                 >
-                    <option value="">(Bez foldera)</option>
+                    <option value="all">Sve ponude</option>
+                    <option value="none">Bez foldera</option>
                     {folders.map((f) => (
-                        <option key={f.id} value={f.id}>
+                        <option key={f.id} value={f.id.toString()}>
                             {f.name}
                         </option>
                     ))}
                 </select>
-
-                <input
-                    type="text"
-                    value={newFolderName}
-                    onChange={(e) => setNewFolderName(e.target.value)}
-                    placeholder="Novi folder"
-                    className="border p-1 w-32"
-                />
-                <button
-                    onClick={handleCreateFolder}
-                    className="bg-orange-600 text-white px-3 py-1 rounded"
-                >
-                    +
-                </button>
             </div>
 
-            {/* quote summary */}
-            <div className="border p-3 rounded mb-4">
-                <p>Ukupno artikala: {selectedItems.reduce((sum, i) => sum + i.quantity, 0)}</p>
-                <p>Ukupna cijena: {getTotal().toFixed(2)} €</p>
-            </div>
 
-            {/* create pdf */}
-            <div className="flex gap-4 mb-4">
-                <button
-                    onClick={handleCreateQuote}
-                    className="bg-orange-600 text-white px-4 py-2 rounded hover:bg-orange-700"
-                >
-                    Kreiraj ponudu
-                </button>
-                <button
-                    onClick={handleGeneratePdf}
-                    className="bg-orange-600 text-white px-4 py-2 rounded hover:bg-orange-700"
-                >
-                    Preuzmi PDF
-                </button>
-            </div>
+            <hr/>
 
-            <hr />
-
-            {/* show quotes with no folder */}
-            <div className="mt-4">
-                <h2 className="text-lg font-semibold mb-2">Ponude bez foldera</h2>
-                {folderlessQuotes.length === 0 ? (
-                    <p className="text-sm text-gray-500">Nema ponuda.</p>
+            <div>
+                {displayedQuotes.length === 0 ? (
+                    <p className="text-sm text-gray-500">Nema ponuda za odabrani folder.</p>
                 ) : (
-                    folderlessQuotes.map((q) => {
+                    displayedQuotes.map((q) => {
                         const total = q.items.reduce((sum, it) => {
-                            const pr = products.find((p) => p.id === it.productId);
-                            if (!pr) return sum;
-                            return sum + pr.price * it.quantity;
+                            const prod = products.find((p) => p.id === it.productId);
+                            return prod ? sum + prod.price * it.quantity : sum;
                         }, 0);
-
                         return (
                             <div key={q.id} className="border p-3 rounded mb-2">
                                 <p>ID Ponude: {q.id}</p>
-                                <p>Datum: {q.createdAt.toLocaleString()}</p>
-                                <p>Ukupan iznos: {total.toFixed(2)} €</p>
+                                <p>Datum: {new Date(q.createdAt).toLocaleString()}</p>
+                                <p>Ukupno: {total.toFixed(2)} €</p>
                                 <ul className="list-disc pl-5">
                                     {q.items.map((i) => {
-                                        const pr = products.find((pp) => pp.id === i.productId);
-                                        if (!pr) return null;
-                                        return (
+                                        const prod = products.find((p) => p.id === i.productId);
+                                        return prod ? (
                                             <li key={i.productId}>
-                                                {pr.name} x {i.quantity} = {(pr.price * i.quantity).toFixed(2)} €
+                                                {prod.name} x {i.quantity} ={" "}
+                                                {(prod.price * i.quantity).toFixed(2)} €
                                             </li>
-                                        );
+                                        ) : null;
                                     })}
                                 </ul>
-                            </div>
-                        );
-                    })
-                )}
-            </div>
-
-            {/* show folders with quotes in them */}
-            <div className="mt-4">
-                <h2 className="text-lg font-semibold mb-2">Mape</h2>
-                {folders.length === 0 ? (
-                    <p className="text-sm text-gray-500">Nema foldera.</p>
-                ) : (
-                    folders.map((f) => {
-                        const inThisFolder = quotes.filter((q) => f.quoteIds.includes(q.id));
-                        return (
-                            <div key={f.id} className="border p-3 rounded mb-4">
-                                <p className="font-semibold">{f.name}</p>
-                                {inThisFolder.length === 0 ? (
-                                    <p className="text-sm text-gray-500">
-                                        Nema ponuda u ovom folderu.
-                                    </p>
-                                ) : (
-                                    inThisFolder.map((q) => {
-                                        const total = q.items.reduce((sum, it) => {
-                                            const pr = products.find((p) => p.id === it.productId);
-                                            if (!pr) return sum;
-                                            return sum + pr.price * it.quantity;
-                                        }, 0);
-
-                                        return (
-                                            <div key={q.id} className="ml-3 p-2 border rounded mt-2">
-                                                <p>
-                                                    ID Ponude: {q.id} (Datum:{" "}
-                                                    {q.createdAt.toLocaleString()})
-                                                </p>
-                                                <p>Ukupno: {total.toFixed(2)} €</p>
-                                                <ul className="list-disc pl-5">
-                                                    {q.items.map((item) => {
-                                                        const foundProd = products.find(
-                                                            (p) => p.id === item.productId
-                                                        );
-                                                        if (!foundProd) return null;
-                                                        return (
-                                                            <li key={foundProd.id}>
-                                                                {foundProd.name} x {item.quantity} ={" "}
-                                                                {(foundProd.price * item.quantity).toFixed(2)} €
-                                                            </li>
-                                                        );
-                                                    })}
-                                                </ul>
-                                            </div>
-                                        );
-                                    })
-                                )}
                             </div>
                         );
                     })
