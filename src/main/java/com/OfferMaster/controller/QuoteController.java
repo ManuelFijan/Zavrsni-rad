@@ -2,19 +2,24 @@ package com.OfferMaster.controller;
 
 import com.OfferMaster.dto.QuoteCreateDto;
 import com.OfferMaster.dto.QuoteResponseDto;
+import com.OfferMaster.service.EmailService;
 import com.OfferMaster.service.QuoteService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/quotes")
 public class QuoteController {
 
-    @Autowired private QuoteService quoteService;
+    private final QuoteService quoteService;
+    private final EmailService emailService;
+
+    public QuoteController(QuoteService quoteService, EmailService emailService) {
+        this.quoteService = quoteService;
+        this.emailService = emailService;
+    }
 
     @PostMapping
     public ResponseEntity<Long> createQuote(@RequestBody QuoteCreateDto dto) {
@@ -36,5 +41,14 @@ public class QuoteController {
     public ResponseEntity<List<QuoteResponseDto>> listQuotes() {
         List<QuoteResponseDto> all = quoteService.getAllQuotes();
         return ResponseEntity.ok(all);
+    }
+
+    @PostMapping("/{id}/email")
+    public ResponseEntity<Void> sendQuoteByEmail(
+            @PathVariable Long id,
+            @RequestParam String recipientEmail,
+            @RequestParam(required = false) String recipientName) {
+        emailService.sendQuoteEmail(recipientEmail, recipientName, id);
+        return ResponseEntity.ok().build();
     }
 }
