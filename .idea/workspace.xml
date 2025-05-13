@@ -4,10 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3694cb8b-40c4-4407-bcc1-59c645812f6b" name="Changes" comment="poboljšanje pretrage i dohvaćanja proizvoda iz baze">
+    <list default="true" id="3694cb8b-40c4-4407-bcc1-59c645812f6b" name="Changes" comment="izrada funkcionalnosti stvaranja i spremanja ponuda u bazu">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/pages/QuotesPage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/QuotesPage.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/services/QuoteService.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/services/QuoteService.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/ConversationPage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/ConversationPage.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/services/EmailService.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/services/EmailService.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -142,7 +142,7 @@
       <workItem from="1744868560154" duration="8608000" />
       <workItem from="1744907003350" duration="25000" />
       <workItem from="1747041752909" duration="7971000" />
-      <workItem from="1747134732211" duration="11464000" />
+      <workItem from="1747134732211" duration="13459000" />
     </task>
     <task id="LOCAL-00001" summary="inicijalni commit">
       <option name="closed" value="true" />
@@ -248,7 +248,15 @@
       <option name="project" value="LOCAL" />
       <updated>1747158562526</updated>
     </task>
-    <option name="localTasksCounter" value="14" />
+    <task id="LOCAL-00014" summary="izrada funkcionalnosti stvaranja i spremanja ponuda u bazu">
+      <option name="closed" value="true" />
+      <created>1747172997630</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1747172997630</updated>
+    </task>
+    <option name="localTasksCounter" value="15" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -279,6 +287,7 @@
     <MESSAGE value="ispravci/poboljšanje dodavanja i uređivanja arikala u bazi" />
     <MESSAGE value="dodavanje poruke kod ažuriranja profila" />
     <MESSAGE value="poboljšanje pretrage i dohvaćanja proizvoda iz baze" />
-    <option name="LAST_COMMIT_MESSAGE" value="poboljšanje pretrage i dohvaćanja proizvoda iz baze" />
+    <MESSAGE value="izrada funkcionalnosti stvaranja i spremanja ponuda u bazu" />
+    <option name="LAST_COMMIT_MESSAGE" value="izrada funkcionalnosti stvaranja i spremanja ponuda u bazu" />
   </component>
 </project>
