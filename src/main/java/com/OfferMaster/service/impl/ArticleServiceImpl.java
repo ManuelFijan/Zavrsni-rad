@@ -29,7 +29,7 @@ public class ArticleServiceImpl implements ArticleService {
         Page<Article> articlePage;
 
         if (name != null && !name.isEmpty()) {
-            articlePage = articleRepository.findByNameStartingWith(name, pageRequest);
+            articlePage = articleRepository.findByNameContainingIgnoreCase(name, pageRequest);
         } else {
             articlePage = articleRepository.findAll(pageRequest);
         }
