@@ -6,6 +6,13 @@ public class QuoteCreateDto {
     private String logoBase64;
     private List<QuoteItemRequestDto> items;
 
+    public <T> QuoteCreateDto(Object o, List<T> ts) {
+    }
+
+    public QuoteCreateDto() {
+
+    }
+
     public String getLogoBase64() {
         return logoBase64;
     }

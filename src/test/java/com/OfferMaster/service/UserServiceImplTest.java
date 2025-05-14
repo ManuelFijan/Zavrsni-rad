@@ -10,15 +10,19 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.context.SecurityContextImpl;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.server.ResponseStatusException;
-
 import java.util.Optional;
-
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 
 @ExtendWith(MockitoExtension.class)
+@AutoConfigureMockMvc(addFilters = false)
 class UserServiceImplTest {
     @Mock
     UserRepository repo;
@@ -89,8 +93,14 @@ class UserServiceImplTest {
 
     @Test
     void updateUserProfile_notFound_throws() {
-        given(repo.findByEmail(any())).willReturn(Optional.empty());
+        Authentication auth = mock(Authentication.class);
+        when(auth.getName()).thenReturn("missing@user.com");
+        SecurityContext ctx = new SecurityContextImpl();
+        ctx.setAuthentication(auth);
+        SecurityContextHolder.setContext(ctx);
+        given(repo.findByEmail("missing@user.com")).willReturn(Optional.empty());
         assertThatThrownBy(() -> svc.updateUserProfile(new UserProfileUpdateDto()))
-                .isInstanceOf(ResponseStatusException.class);
+                .isInstanceOf(ResponseStatusException.class)
+                .hasMessageContaining("not found");
     }
 }

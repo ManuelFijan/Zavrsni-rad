@@ -13,6 +13,7 @@ import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.*;
 import org.springframework.web.server.ResponseStatusException;
+import java.util.List;
 import java.util.Optional;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
@@ -50,11 +51,14 @@ class ArticleServiceImplTest {
 
     @Test
     void getArticles_withSearch_usesFindByName() {
-        Page<Article> page = new PageImpl<>(java.util.List.of(a1), Pageable.unpaged(), 1);
-        given(repo.findByNameStartingWith(eq("X"), any(Pageable.class))).willReturn(page);
+        Pageable pageable = PageRequest.of(0, 1);
+        Page<Article> page = new PageImpl<>(List.of(a1), pageable, 1);
+        given(repo.findByNameContainingIgnoreCase(anyString(), any(Pageable.class)))
+                .willReturn(page);
 
-        Page<ArticleDto> result = svc.getArticles(0,1,"X");
-        then(repo).should().findByNameStartingWith(eq("X"), any(Pageable.class));
+        Page<ArticleDto> result = svc.getArticles(0, 1, "X");
+
+        then(repo).should().findByNameContainingIgnoreCase(eq("X"), any(Pageable.class));
         assertThat(result.getContent().get(0).getName()).isEqualTo("X");
     }
 

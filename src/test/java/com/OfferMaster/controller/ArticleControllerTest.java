@@ -7,6 +7,7 @@ import com.OfferMaster.service.ArticleService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.data.domain.*;
 import org.springframework.http.MediaType;
@@ -19,6 +20,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(ArticleController.class)
+@AutoConfigureMockMvc(addFilters = false)
 class ArticleControllerTest {
     @Autowired
     MockMvc mvc;
@@ -28,6 +30,9 @@ class ArticleControllerTest {
 
     @Autowired
     ObjectMapper mapper;
+
+    @MockitoBean
+    com.OfferMaster.security.JwtUtil jwtUtil;
 
     @Test
     void getArticles_returnsPage() throws Exception {

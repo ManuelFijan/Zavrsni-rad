@@ -10,17 +10,18 @@ import com.OfferMaster.security.JwtUtil;
 import com.OfferMaster.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.http.MediaType;
-
 import static org.mockito.BDDMockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(UserController.class)
+@AutoConfigureMockMvc(addFilters = false)
 class UserControllerTest {
     @Autowired
     private MockMvc mvc;
@@ -36,10 +37,9 @@ class UserControllerTest {
 
     @Test
     void register_returnsTokenAndUser() throws Exception {
-        // build DTO via setters
         var regDto = new UserRegistrationDto();
         regDto.setEmail("a@b");
-        regDto.setPassword("pass");
+        regDto.setPassword("password");
         regDto.setFirstName("First");
         regDto.setLastName("Last");
         regDto.setPrimaryAreaOfWork(PrimaryAreaOfWork.ELEKTRIKA);
@@ -57,7 +57,7 @@ class UserControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(regDto)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.token").value("tok"))
+                .andExpect(jsonPath("$.accessToken").value("tok"))
                 .andExpect(jsonPath("$.user.email").value("a@b"));
     }
 
@@ -77,7 +77,7 @@ class UserControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(loginReq)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.token").value("tok"))
+                .andExpect(jsonPath("$.accessToken").value("tok"))
                 .andExpect(jsonPath("$.user.email").value("a@b"));
     }
 

@@ -9,6 +9,10 @@ public class QuoteItemDto {
         this.quantity = quantity;
     }
 
+    public QuoteItemDto() {
+
+    }
+
     public Long getProductId() {
         return productId;
     }
