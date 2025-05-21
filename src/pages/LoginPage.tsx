@@ -13,6 +13,7 @@ function LoginPage() {
     const [forgotEmail, setForgotEmail] = useState("");
     const [statusMsg, setStatusMsg] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
+    const [forgotError,   setForgotError]   = useState("");
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -37,8 +38,9 @@ function LoginPage() {
     };
 
     const handleForgotSubmit = async () => {
+        setForgotError("");
         if (!forgotEmail) {
-            alert("Unesite email");
+            setForgotError("Unesite email.");
             return;
         }
         try {
@@ -50,7 +52,7 @@ function LoginPage() {
                 setForgotEmail("");
             }, 3000);
         } catch (e: any) {
-            alert("Greška pri slanju emaila.");
+            setForgotError("Greška pri slanju emaila.");
         }
     };
 
@@ -111,7 +113,14 @@ function LoginPage() {
                                             className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
                                             <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
                                                 <h3 className="text-lg font-medium mb-4">Zaboravljena lozinka</h3>
-                                                <p className="mb-4">Unesite email za reset lozinke:</p>
+                                                <p className="mb-4">Unesite email za čiji račun želite resetirati lozinku:</p>
+
+                                                {forgotError && (
+                                                    <div className="my-2 rounded bg-red-100 border border-red-300 text-red-700 px-4 py-2">
+                                                        {forgotError}
+                                                    </div>
+                                                )}
+
                                                 <input
                                                     type="email"
                                                     placeholder="Email"
@@ -122,15 +131,18 @@ function LoginPage() {
                                                 {statusMsg && <p className="text-green-600 mb-4">{statusMsg}</p>}
                                                 <div className="flex justify-end">
                                                     <button
+                                                        type="button"
                                                         className="mr-2 px-4 py-2"
                                                         onClick={() => {
                                                             setShowModal(false);
                                                             setStatusMsg("");
+                                                            setForgotError("");
                                                         }}
                                                     >
                                                         Otkaži
                                                     </button>
                                                     <button
+                                                        type="button"
                                                         className="bg-orange-500 text-white px-4 py-2 rounded"
                                                         onClick={handleForgotSubmit}
                                                     >

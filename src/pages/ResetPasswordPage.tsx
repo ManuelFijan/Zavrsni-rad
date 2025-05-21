@@ -10,19 +10,31 @@ function ResetPasswordPage() {
     const [pw, setPw] = useState("");
     const [confirm, setConfirm] = useState("");
     const [error, setError] = useState("");
+    const [success, setSuccess] = useState("");
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        setSuccess("");
+        setError("");
+
+        const regex = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
+        if (!regex.test(pw)) {
+            setError(
+                "Lozinka mora imati najmanje 8 znakova, jedno veliko slovo i jednu brojku."
+            );
+            return;
+        }
+
         if (pw !== confirm) {
             setError("Lozinke se ne podudaraju.");
             return;
         }
         try {
             await resetPassword(token, pw);
-            alert("Lozinka uspješno promijenjena.");
-            navigate("/login");
+            setSuccess("Lozinka uspješno promijenjena.");
+            setTimeout(() => navigate("/sign-in"), 2000);
         } catch {
-            setError("Pogreška pri resetiranju lozinke.");
+            setError("Greška pri slanju zahtjeva za reset lozinke.");
         }
     };
 
@@ -30,7 +42,10 @@ function ResetPasswordPage() {
         <div className="flex min-h-screen items-center justify-center">
             <form onSubmit={handleSubmit} className="p-6 bg-white rounded shadow-md w-full max-w-sm">
                 <h2 className="text-xl mb-4">Reset lozinke</h2>
+
                 {error && <p className="text-red-600 mb-2">{error}</p>}
+                {success && <p className="text-green-600 mb-2">{success}</p>}
+
                 <input
                     type="password"
                     placeholder="Nova lozinka"
