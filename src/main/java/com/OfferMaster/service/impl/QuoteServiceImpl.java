@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.*;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -32,22 +34,35 @@ public class QuoteServiceImpl implements QuoteService {
     private final QuoteRepository quoteRepo;
     private final ArticleRepository articleRepo;
     private final WebClient supabaseClient;
+    private final UserRepository userRepository;
 
     @Autowired
     public QuoteServiceImpl(
             QuoteRepository quoteRepo,
             ArticleRepository articleRepo,
-            WebClient supabaseClient
+            WebClient supabaseClient, UserRepository userRepository
     ) {
         this.quoteRepo = quoteRepo;
         this.articleRepo = articleRepo;
         this.supabaseClient = supabaseClient;
+        this.userRepository = userRepository;
+    }
+
+    @Override
+    public User currentUser() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String email = auth.getName();
+        return userRepository.findByEmail(email)
+                .orElseThrow(() ->
+                        new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not found"));
     }
 
     @Override
     @Transactional
     public Long createQuote(QuoteCreateDto dto) {
+        User user = currentUser();
         Quote q = new Quote();
+        q.setUser(user);
 
         if (dto.getLogoBase64() != null && !dto.getLogoBase64().isBlank()) {
             String base64 = dto.getLogoBase64();
@@ -170,8 +185,14 @@ public class QuoteServiceImpl implements QuoteService {
     @Override
     @Transactional(readOnly = true)
     public QuoteResponseDto getQuoteById(Long id) {
+        User user = currentUser();
         Quote q = quoteRepo.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Quote not found"));
+
+        if (!q.getUser().getUserId().equals(user.getUserId())) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Quote not found");
+        }
+
         return new QuoteResponseDto(
                 q.getId(),
                 q.getItems().stream()
@@ -185,7 +206,9 @@ public class QuoteServiceImpl implements QuoteService {
     @Override
     @Transactional(readOnly = true)
     public List<QuoteResponseDto> getAllQuotes() {
-        return quoteRepo.findAll().stream()
+        User user = currentUser();
+
+        return quoteRepo.findByUser(user).stream()
                 .map(q -> new QuoteResponseDto(
                                 q.getId(),
                                 q.getItems().stream()
