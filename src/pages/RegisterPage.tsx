@@ -4,6 +4,8 @@ import Logo from "../components/Logo";
 import BackButton from "../components/BackButton";
 import {register} from "../services/AuthService";
 
+const PASSWORD_PATTERN = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
+
 function RegisterPage() {
     const navigate = useNavigate();
 
@@ -18,6 +20,13 @@ function RegisterPage() {
         e.preventDefault();
         setErrorMessage(null)
 
+        if (!PASSWORD_PATTERN.test(password)) {
+            setErrorMessage(
+                "Lozinka mora imati najmanje 8 znakova, uključujući jedno veliko slovo i jednu brojku."
+            );
+            return;
+        }
+
         if (!firstName || !lastName || !email || !password || !primaryAreaOfWork) {
             alert("Molimo vas da popunite sva polja.");
             return;
@@ -31,9 +40,9 @@ function RegisterPage() {
 
             navigate("/homepage");
         } catch (err: any) {
-            if (err.response?.status === 403) {
+            if (err.response?.status === 409) {
                 setErrorMessage(
-                    "Ovaj email se već koristi. Registrirajte se s drugim mailom."
+                    "Ovaj email je već registriran. Ako već imate račun, prijavite se ili upotrijebite drugi email."
                 );
             } else {
                 setErrorMessage(
@@ -142,7 +151,11 @@ function RegisterPage() {
                                     autoComplete="new-password"
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
-                                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-orange-300 sm:text-sm sm:leading-6"
+                                    className={`block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ${
+                                        errorMessage?.toLowerCase().includes("lozinka")
+                                            ? "ring-red-500 focus:ring-red-500"
+                                            : "ring-gray-300 focus:ring-orange-300"
+                                    } placeholder:text-gray-400 sm:text-sm sm:leading-6`}
                                 />
                             </div>
                         </div>

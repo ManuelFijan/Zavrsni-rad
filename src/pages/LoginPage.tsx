@@ -12,9 +12,11 @@ function LoginPage() {
     const [showModal, setShowModal] = useState(false);
     const [forgotEmail, setForgotEmail] = useState("");
     const [statusMsg, setStatusMsg] = useState("");
+    const [errorMessage, setErrorMessage] = useState("");
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+        setErrorMessage("");
 
         if (!email || !password) {
             alert("Molimo vas da unesete email i lozinku.");
@@ -26,7 +28,11 @@ function LoginPage() {
             console.log("JWT:", accessToken, "User:", user);
             navigate("/homepage");
         } catch (err: any) {
-            alert(err);
+            if (err.response?.status === 401) {
+                setErrorMessage("Email ili lozinka su pogrešni, pokušajte ponovno");
+            } else {
+                setErrorMessage(err.response?.data?.message || "Dogodila se greška. Pokušajte ponovno.");
+            }
         }
     };
 
@@ -60,6 +66,13 @@ function LoginPage() {
                 </div>
 
                 <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
+
+                    {errorMessage && (
+                        <div className="my-4 rounded bg-red-100 border border-red-300 text-red-700 px-4 py-2">
+                            {errorMessage}
+                        </div>
+                    )}
+
                     <form onSubmit={handleSubmit} className="space-y-6">
                         <div>
                             <label htmlFor="email" className="block text-sm font-medium leading-6 text-gray-900">
