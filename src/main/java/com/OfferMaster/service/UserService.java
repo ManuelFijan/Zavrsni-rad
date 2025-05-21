@@ -7,4 +7,6 @@ public interface UserService {
     LoginResponseDto loginUser(LoginRequestDto loginRequest);
     UserDto updateUserProfile(UserProfileUpdateDto profileUpdateDto);
     UserDto getCurrentUserProfile();
+    void forgotPassword(String email);
+    void resetPassword(String token, String newPassword);
 }

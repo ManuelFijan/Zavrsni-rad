@@ -45,4 +45,16 @@ public class UserController {
         UserDto dto = userService.getCurrentUserProfile();
         return ResponseEntity.ok(dto);
     }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<Void> forgotPassword(@Valid @RequestBody PasswordResetRequestDto dto) {
+        userService.forgotPassword(dto.getEmail());
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<Void> resetPassword(@Valid @RequestBody PasswordResetDto dto) {
+        userService.resetPassword(dto.getToken(), dto.getNewPassword());
+        return ResponseEntity.ok().build();
+    }
 }

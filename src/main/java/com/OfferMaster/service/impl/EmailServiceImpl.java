@@ -11,6 +11,7 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring6.SpringTemplateEngine;
+import java.nio.charset.StandardCharsets;
 
 @Service
 public class EmailServiceImpl implements EmailService {
@@ -56,5 +57,31 @@ public class EmailServiceImpl implements EmailService {
             throw new RuntimeException("Ne mogu poslati email.", ex);
         }
     }
+
+    @Override
+    public void sendPasswordResetEmail(String toEmail, String resetToken) {
+        Context ctx = new Context();
+        String resetLink = "http://localhost:3000/reset-password?token=" + resetToken;
+        ctx.setVariable("resetLink", resetLink);
+        String html = templateEngine.process("password-reset-email", ctx);
+
+        MimeMessage msg = mailSender.createMimeMessage();
+        try {
+            MimeMessageHelper helper = new MimeMessageHelper(
+                    msg,
+                    MimeMessageHelper.MULTIPART_MODE_MIXED_RELATED,
+                    StandardCharsets.UTF_8.name()
+            );
+            helper.setFrom(fromAddress);
+            helper.setTo(toEmail);
+            helper.setSubject("Resetirajte svoju lozinku");
+            helper.setText(html, true);
+
+            mailSender.send(msg);
+        } catch (MessagingException ex) {
+            throw new RuntimeException("Ne mogu poslati reset lozinke email.", ex);
+        }
+    }
+
 }
 
