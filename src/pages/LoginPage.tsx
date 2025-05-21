@@ -1,14 +1,17 @@
-import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, {useState} from "react";
+import {Link, useNavigate} from "react-router-dom";
 import Logo from "../components/Logo";
 import BackButton from "../components/BackButton";
-import { login } from "../services/AuthService";
+import {login, forgotPassword} from "../services/AuthService";
 
 function LoginPage() {
     const navigate = useNavigate();
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [showModal, setShowModal] = useState(false);
+    const [forgotEmail, setForgotEmail] = useState("");
+    const [statusMsg, setStatusMsg] = useState("");
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -19,7 +22,7 @@ function LoginPage() {
         }
 
         try {
-            const { accessToken, user } = await login(email, password);
+            const {accessToken, user} = await login(email, password);
             console.log("JWT:", accessToken, "User:", user);
             navigate("/homepage");
         } catch (err: any) {
@@ -27,12 +30,30 @@ function LoginPage() {
         }
     };
 
+    const handleForgotSubmit = async () => {
+        if (!forgotEmail) {
+            alert("Unesite email");
+            return;
+        }
+        try {
+            await forgotPassword(forgotEmail);
+            setStatusMsg("Ako je email registriran, primit ćete upute.");
+            setTimeout(() => {
+                setShowModal(false);
+                setStatusMsg("");
+                setForgotEmail("");
+            }, 3000);
+        } catch (e: any) {
+            alert("Greška pri slanju emaila.");
+        }
+    };
+
     return (
         <>
-            <BackButton />
+            <BackButton/>
             <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
                 <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-                    <Logo />
+                    <Logo/>
                     <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
                         Prijavite se u svoj račun
                     </h2>
@@ -64,13 +85,48 @@ function LoginPage() {
                                     Lozinka
                                 </label>
                                 <div className="text-sm">
-                                    <Link
-                                        to="#"
+                                    <button
+                                        type="button"
                                         className="font-semibold text-orange-500 hover:text-orange-300"
-                                        onClick={(e) => e.preventDefault()}
+                                        onClick={() => setShowModal(true)}
                                     >
                                         Zaboravljena lozinka?
-                                    </Link>
+                                    </button>
+
+                                    {showModal && (
+                                        <div
+                                            className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+                                            <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
+                                                <h3 className="text-lg font-medium mb-4">Zaboravljena lozinka</h3>
+                                                <p className="mb-4">Unesite email za reset lozinke:</p>
+                                                <input
+                                                    type="email"
+                                                    placeholder="Email"
+                                                    value={forgotEmail}
+                                                    onChange={e => setForgotEmail(e.target.value)}
+                                                    className="w-full border rounded px-3 py-2 mb-4"
+                                                />
+                                                {statusMsg && <p className="text-green-600 mb-4">{statusMsg}</p>}
+                                                <div className="flex justify-end">
+                                                    <button
+                                                        className="mr-2 px-4 py-2"
+                                                        onClick={() => {
+                                                            setShowModal(false);
+                                                            setStatusMsg("");
+                                                        }}
+                                                    >
+                                                        Otkaži
+                                                    </button>
+                                                    <button
+                                                        className="bg-orange-500 text-white px-4 py-2 rounded"
+                                                        onClick={handleForgotSubmit}
+                                                    >
+                                                        Pošalji
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                             <div className="mt-2">
@@ -112,4 +168,5 @@ function LoginPage() {
         </>
     );
 }
+
 export default LoginPage;

@@ -4,10 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3694cb8b-40c4-4407-bcc1-59c645812f6b" name="Changes" comment="izrada funkcionalnosti stvaranja i spremanja ponuda u bazu">
+    <list default="true" id="3694cb8b-40c4-4407-bcc1-59c645812f6b" name="Changes" comment="izrada funkcionalnosti slanja ponuda na email i redizajn prozora za slanje maila">
+      <change afterPath="$PROJECT_DIR$/src/pages/ResetPasswordPage.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/pages/ConversationPage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/ConversationPage.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/services/EmailService.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/services/EmailService.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/App.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/App.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/LoginPage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/LoginPage.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/services/AuthService.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/services/AuthService.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -142,7 +144,12 @@
       <workItem from="1744868560154" duration="8608000" />
       <workItem from="1744907003350" duration="25000" />
       <workItem from="1747041752909" duration="7971000" />
-      <workItem from="1747134732211" duration="13459000" />
+      <workItem from="1747134732211" duration="15965000" />
+      <workItem from="1747211259581" duration="2388000" />
+      <workItem from="1747404467141" duration="1761000" />
+      <workItem from="1747583555542" duration="585000" />
+      <workItem from="1747749178038" duration="4406000" />
+      <workItem from="1747816815162" duration="333000" />
     </task>
     <task id="LOCAL-00001" summary="inicijalni commit">
       <option name="closed" value="true" />
@@ -256,7 +263,15 @@
       <option name="project" value="LOCAL" />
       <updated>1747172997630</updated>
     </task>
-    <option name="localTasksCounter" value="15" />
+    <task id="LOCAL-00015" summary="izrada funkcionalnosti slanja ponuda na email i redizajn prozora za slanje maila">
+      <option name="closed" value="true" />
+      <created>1747177271896</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1747177271896</updated>
+    </task>
+    <option name="localTasksCounter" value="16" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -288,6 +303,7 @@
     <MESSAGE value="dodavanje poruke kod ažuriranja profila" />
     <MESSAGE value="poboljšanje pretrage i dohvaćanja proizvoda iz baze" />
     <MESSAGE value="izrada funkcionalnosti stvaranja i spremanja ponuda u bazu" />
-    <option name="LAST_COMMIT_MESSAGE" value="izrada funkcionalnosti stvaranja i spremanja ponuda u bazu" />
+    <MESSAGE value="izrada funkcionalnosti slanja ponuda na email i redizajn prozora za slanje maila" />
+    <option name="LAST_COMMIT_MESSAGE" value="izrada funkcionalnosti slanja ponuda na email i redizajn prozora za slanje maila" />
   </component>
 </project>

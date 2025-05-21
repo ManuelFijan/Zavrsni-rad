@@ -11,6 +11,7 @@ import PrivacyPolicyPage from "./pages/PrivacyPolicyPage";
 import TermsOfServicePage from "./pages/TermsOfServicePage";
 import ProfilePage from "./pages/ProfilePage";
 import {AuthProvider} from "./services/AuthContext";
+import ResetPasswordPage from "./pages/ResetPasswordPage";
 
 function App() {
     return (
@@ -26,6 +27,7 @@ function App() {
                 <Route path={"/terms-of-service-page"} element={<TermsOfServicePage/>}></Route>
                 <Route path={"/error"} element={<NotFoundPage></NotFoundPage>}></Route>
                 <Route path={"/profile"} element={<ProfilePage/>}/>
+                <Route path="/reset-password" element={<ResetPasswordPage />} />
 
                 <Route path={"*"} element={<NotFoundPage/>}></Route>
             </Routes>

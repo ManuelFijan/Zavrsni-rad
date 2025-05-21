@@ -53,3 +53,11 @@ export async function register(
 
     return {accessToken, tokenType, user};
 }
+
+export async function forgotPassword(email: string): Promise<void> {
+    await apiClient.post("/api/auth/forgot-password", { email });
+}
+
+export async function resetPassword(token: string, newPassword: string): Promise<void> {
+    await apiClient.post("/api/auth/reset-password", { token, newPassword });
+}
