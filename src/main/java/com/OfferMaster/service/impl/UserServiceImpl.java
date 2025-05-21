@@ -60,14 +60,13 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public LoginResponseDto loginUser(LoginRequestDto loginRequest) {
-        Optional<User> userOpt = userRepository.findByEmail(loginRequest.getIdentifier());
-        if (userOpt.isEmpty()) {
-            throw new RuntimeException("User not found with identifier: " + loginRequest.getIdentifier());
-        }
-        User user = userOpt.get();
+        User user = userRepository.findByEmail(loginRequest.getIdentifier())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Email ili lozinka su pogrešni, pokušajte ponovno"));
+
         if (!passwordEncoder.matches(loginRequest.getPassword(), user.getPasswordHash())) {
-            throw new RuntimeException("Invalid password");
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Email ili lozinka su pogrešni, pokušajte ponovno");
         }
+
         String token = jwtUtil.generateToken(user.getEmail());
         return new LoginResponseDto(token, userMapper.toDto(user));
     }
