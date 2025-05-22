@@ -1,6 +1,7 @@
 package com.OfferMaster.model;
 
 import com.OfferMaster.enums.ArticleCategory;
+import com.OfferMaster.enums.MeasureUnit;
 import jakarta.persistence.*;
 
 import java.util.Objects;
@@ -25,6 +26,18 @@ public class Article {
 
     @Column
     private String description;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private MeasureUnit measureUnit;
+
+    public MeasureUnit getMeasureUnit() {
+        return measureUnit;
+    }
+
+    public void setMeasureUnit(MeasureUnit measureUnit) {
+        this.measureUnit = measureUnit;
+    }
 
     public Long getArticleId() {
         return articleId;

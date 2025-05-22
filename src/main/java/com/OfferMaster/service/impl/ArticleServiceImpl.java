@@ -51,6 +51,7 @@ public class ArticleServiceImpl implements ArticleService {
         article.setDescription(articleRequestDto.getDescription());
         article.setPrice(articleRequestDto.getPrice());
         article.setCategory(articleRequestDto.getCategory());
+        article.setMeasureUnit(articleRequestDto.getMeasureUnit());
 
         Article savedArticle = articleRepository.save(article);
 
@@ -76,6 +77,7 @@ public class ArticleServiceImpl implements ArticleService {
         article.setCategory(articleRequestDto.getCategory());
         article.setPrice(articleRequestDto.getPrice());
         article.setDescription(articleRequestDto.getDescription());
+        article.setMeasureUnit(articleRequestDto.getMeasureUnit());
 
         Article updatedArticle = articleRepository.save(article);
         return convertToDto(updatedArticle);
@@ -88,6 +90,7 @@ public class ArticleServiceImpl implements ArticleService {
         dto.setDescription(article.getDescription());
         dto.setCategory(article.getCategory());
         dto.setPrice(article.getPrice());
+        dto.setMeasureUnit(article.getMeasureUnit());
         return dto;
     }
 }

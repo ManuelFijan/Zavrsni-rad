@@ -1,6 +1,7 @@
 package com.OfferMaster.dto;
 
 import com.OfferMaster.enums.ArticleCategory;
+import com.OfferMaster.enums.MeasureUnit;
 
 public class ArticleDto {
     private Long articleId;
@@ -8,15 +9,25 @@ public class ArticleDto {
     private ArticleCategory category;
     private Double price;
     private String description;
+    private MeasureUnit measureUnit;
 
     public ArticleDto() {}
 
-    public ArticleDto(Long articleId, String name, ArticleCategory category, Double price, String description) {
+    public ArticleDto(Long articleId, String name, ArticleCategory category, Double price, String description, MeasureUnit measureUnit) {
         this.articleId = articleId;
         this.name = name;
         this.category = category;
         this.price = price;
         this.description = description;
+        this.measureUnit = measureUnit;
+    }
+
+    public MeasureUnit getMeasureUnit() {
+        return measureUnit;
+    }
+
+    public void setMeasureUnit(MeasureUnit measureUnit) {
+        this.measureUnit = measureUnit;
     }
 
     public Long getArticleId() {
