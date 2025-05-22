@@ -8,10 +8,10 @@ import com.OfferMaster.service.ArticleService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-
 import java.util.List;
 
 @Service
@@ -25,14 +25,10 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Override
     public Page<ArticleDto> getArticles(int page, int size, String name) {
-        Pageable pageRequest = PageRequest.of(page, size);
-        Page<Article> articlePage;
-
-        if (name != null && !name.isEmpty()) {
-            articlePage = articleRepository.findByNameContainingIgnoreCase(name, pageRequest);
-        } else {
-            articlePage = articleRepository.findAll(pageRequest);
-        }
+        Pageable pageRequest = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "articleId"));
+        Page<Article> articlePage = (name != null && !name.isEmpty())
+                ? articleRepository.findByNameContainingIgnoreCase(name, pageRequest)
+                : articleRepository.findAll(pageRequest);
 
         return articlePage.map(this::convertToDto);
     }
