@@ -1,11 +1,14 @@
 import apiClient from "./axiosConfig";
 
+export type MeasureUnit = "M2" | "M3" | "KOM";
+
 interface RawProduct {
     articleId: number;
     name: string;
     category: string;
     price: number;
     description: string;
+    measureUnit: MeasureUnit;
 }
 
 export interface Product {
@@ -14,6 +17,7 @@ export interface Product {
     category: string;
     price: number;
     description: string;
+    measureUnit: MeasureUnit;
 }
 
 export interface PaginatedProducts {
@@ -31,6 +35,7 @@ function normalizeProduct(raw: RawProduct): Product {
         category: raw.category,
         price: raw.price,
         description: raw.description,
+        measureUnit: raw.measureUnit,
     };
 }
 

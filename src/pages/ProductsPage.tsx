@@ -7,6 +7,12 @@ const CATEGORY_LABELS: Record<string, string> = {
     GRAĐEVINSKI_MATERIJAL: "Građevinski materijal",
 };
 
+const MEASURE_LABELS: Record<string, string> = {
+    M2: "m²",
+    M3: "m³",
+    KOM: "kom",
+};
+
 const PAGE_SIZE = 20;
 
 const ProductsPage: React.FC = () => {
@@ -25,21 +31,24 @@ const ProductsPage: React.FC = () => {
         category: "",
         price: 0,
         description: "",
+        measureUnit: "KOM",
     });
 
     const [editingProduct, setEditingProduct] = useState<Product | null>(null);
 
+    const fetchPage = useCallback(async (page: number) => {
+        try {
+            const pageData = await getProducts(page, PAGE_SIZE, searchQuery);
+            setProducts(pageData.content);
+            setTotalPages(pageData.totalPages);
+        } catch (err) {
+            console.error("Failed to fetch products:", err);
+        }
+    }, [searchQuery]);
+
     useEffect(() => {
-        (async () => {
-            try {
-                const pageData = await getProducts(currentPage, PAGE_SIZE, searchQuery);
-                setProducts(pageData.content);
-                setTotalPages(pageData.totalPages);
-            } catch (err) {
-                console.error("Failed to fetch products:", err);
-            }
-        })();
-    }, [currentPage, searchQuery]);
+        fetchPage(currentPage);
+    }, [currentPage, fetchPage]);
 
     const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
         setSearchQuery(e.target.value);
@@ -53,7 +62,7 @@ const ProductsPage: React.FC = () => {
     const closeAddModal = () => {
         setAddErrorMessage(null);
         setIsAddModalOpen(false);
-        setNewProduct({name: '', category: '', price: 0, description: ''});
+        setNewProduct({name: '', category: '', price: 0, description: '', measureUnit: "KOM"});
     };
 
     const handleAddInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -70,6 +79,7 @@ const ProductsPage: React.FC = () => {
             await createProduct(newProduct);
             setCurrentPage(0);
             closeAddModal();
+            await fetchPage(0);
         } catch (err: any) {
             if (err.response?.status === 409) {
                 setAddErrorMessage("Ovaj proizvod već postoji. Unesite drugačiji naziv.");
@@ -110,9 +120,11 @@ const ProductsPage: React.FC = () => {
                 category: editingProduct.category,
                 price: editingProduct.price,
                 description: editingProduct.description,
+                measureUnit: editingProduct.measureUnit,
             });
             setCurrentPage(0);
             closeEditModal();
+            await fetchPage(0);
         } catch (err: any) {
             const status = err.response?.status;
             if (status === 409) {
@@ -175,6 +187,9 @@ const ProductsPage: React.FC = () => {
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cijena
                             (€)
                         </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Mjerna
+                            jedinica
+                        </th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Opis</th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"></th>
                     </tr>
@@ -185,6 +200,7 @@ const ProductsPage: React.FC = () => {
                             <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{product.name}</td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{CATEGORY_LABELS[product.category] ?? product.category}</td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{product.price.toFixed(2)}</td>
+                            <td className="px-6 py-4 text-sm text-gray-500">{MEASURE_LABELS[product.measureUnit]}</td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{product.description}</td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                 <button
@@ -313,6 +329,26 @@ const ProductsPage: React.FC = () => {
                                                     className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500 sm:text-sm"
                                                 />
                                             </div>
+
+                                            <div className="mb-4">
+                                                <label htmlFor="measureUnit"
+                                                       className="block text-sm font-medium text-gray-700">
+                                                    Mjerna jedinica
+                                                </label>
+                                                <select
+                                                    name="measureUnit"
+                                                    id="measureUnit"
+                                                    value={newProduct.measureUnit}
+                                                    onChange={handleAddInputChange}
+                                                    required
+                                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500 sm:text-sm"
+                                                >
+                                                    <option value="M2">m²</option>
+                                                    <option value="M3">m³</option>
+                                                    <option value="KOM">kom</option>
+                                                </select>
+                                            </div>
+
                                             <div className="mb-4">
                                                 <label htmlFor="description"
                                                        className="block text-sm font-medium text-gray-700">

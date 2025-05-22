@@ -4,10 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3694cb8b-40c4-4407-bcc1-59c645812f6b" name="Changes" comment="dodane poruke prilikom korištenja krivih podataka za login i provjera duljine lozinke kod registracije">
+    <list default="true" id="3694cb8b-40c4-4407-bcc1-59c645812f6b" name="Changes" comment="dodane poruke za errore prilikom promjene lozinke">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/pages/LoginPage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/LoginPage.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/pages/ResetPasswordPage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/ResetPasswordPage.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/ProductsPage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/ProductsPage.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/services/ProductService.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/services/ProductService.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -147,7 +147,8 @@
       <workItem from="1747404467141" duration="1761000" />
       <workItem from="1747583555542" duration="585000" />
       <workItem from="1747749178038" duration="4406000" />
-      <workItem from="1747816815162" duration="5082000" />
+      <workItem from="1747816815162" duration="6638000" />
+      <workItem from="1747935087772" duration="2935000" />
     </task>
     <task id="LOCAL-00001" summary="inicijalni commit">
       <option name="closed" value="true" />
@@ -285,7 +286,15 @@
       <option name="project" value="LOCAL" />
       <updated>1747819043913</updated>
     </task>
-    <option name="localTasksCounter" value="18" />
+    <task id="LOCAL-00018" summary="dodane poruke za errore prilikom promjene lozinke">
+      <option name="closed" value="true" />
+      <created>1747825334630</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1747825334630</updated>
+    </task>
+    <option name="localTasksCounter" value="19" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -320,6 +329,7 @@
     <MESSAGE value="izrada funkcionalnosti slanja ponuda na email i redizajn prozora za slanje maila" />
     <MESSAGE value="omogućeno resetiranje lozinke" />
     <MESSAGE value="dodane poruke prilikom korištenja krivih podataka za login i provjera duljine lozinke kod registracije" />
-    <option name="LAST_COMMIT_MESSAGE" value="dodane poruke prilikom korištenja krivih podataka za login i provjera duljine lozinke kod registracije" />
+    <MESSAGE value="dodane poruke za errore prilikom promjene lozinke" />
+    <option name="LAST_COMMIT_MESSAGE" value="dodane poruke za errore prilikom promjene lozinke" />
   </component>
 </project>
