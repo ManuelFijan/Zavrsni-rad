@@ -20,6 +20,11 @@ import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Mono;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Base64;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -119,60 +124,100 @@ public class QuoteServiceImpl implements QuoteService {
     public ResponseEntity<Resource> getQuotePdf(Long quoteId) {
         Quote q = quoteRepo.findById(quoteId)
                 .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "Quote not found"));
+                        HttpStatus.NOT_FOUND, "Ponuda ne postoji"
+                ));
 
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+            InputStream fontStream = getClass().getResourceAsStream("/fonts/Roboto-Regular.ttf");
+            if (fontStream == null) {
+                throw new IllegalStateException("Font file missing");
+            }
+            byte[] fontBytes = fontStream.readAllBytes();
+            BaseFont bf = BaseFont.createFont(
+                    "Roboto-Regular.ttf",
+                    BaseFont.IDENTITY_H,
+                    BaseFont.EMBEDDED,
+                    true,
+                    fontBytes,
+                    null
+            );
+            Font headerFont = new Font(bf, 16, Font.BOLD);
+            Font labelFont = new Font(bf, 12, Font.NORMAL);
+            Font boldFont = new Font(bf, 12, Font.BOLD);
+
             Document doc = new Document(PageSize.A4, 36, 36, 36, 36);
             PdfWriter.getInstance(doc, baos);
             doc.open();
 
-            if (q.getLogoUrl() != null) {
-                Image logo = Image.getInstance(new java.net.URL(q.getLogoUrl()));
-                logo.scaleToFit(100, 50);
+            if (q.getLogoUrl() != null && !q.getLogoUrl().isBlank()) {
+                Image logo = Image.getInstance(q.getLogoUrl());
+                logo.scaleToFit(120, 60);
+                logo.setAlignment(Element.ALIGN_LEFT);
                 doc.add(logo);
             }
 
-            Paragraph header = new Paragraph("Ponuda ID: " + q.getId(),
-                    FontFactory.getFont(FontFactory.HELVETICA_BOLD, 16));
-            header.setAlignment(Element.ALIGN_CENTER);
-            doc.add(header);
+            Paragraph title = new Paragraph("PONUDA ID: " + q.getId(), headerFont);
+            title.setAlignment(Element.ALIGN_CENTER);
+            doc.add(title);
             doc.add(Chunk.NEWLINE);
 
-            PdfPTable table = new PdfPTable(4);
+            ZonedDateTime zdt = q.getCreatedAt().atZone(ZoneId.systemDefault());
+            String formattedDate = zdt.format(DateTimeFormatter.ofPattern("dd/MM/yyyy, HH:mm:ss"));
+            Paragraph datePara = new Paragraph("Datum: " + formattedDate, labelFont);
+            datePara.setSpacingAfter(8f);
+            doc.add(datePara);
+
+            PdfPTable table = new PdfPTable(new float[]{3, 2, 1, 2, 2});
             table.setWidthPercentage(100);
-            table.setWidths(new float[]{4, 1, 2, 2});
-            Stream.of("Naziv", "Količina", "Jedinična cijena", "Ukupno")
+            Stream.of("Naziv", "Količina", "Mjerna jedinica", "Jedinična cijena", "Ukupno")
                     .forEach(col -> {
-                        PdfPCell cell = new PdfPCell(new Phrase(col,
-                                FontFactory.getFont(FontFactory.HELVETICA_BOLD)));
-                        cell.setBackgroundColor(BaseColor.LIGHT_GRAY);
-                        table.addCell(cell);
+                        PdfPCell h = new PdfPCell(new Phrase(col, boldFont));
+                        h.setBackgroundColor(BaseColor.LIGHT_GRAY);
+                        h.setHorizontalAlignment(Element.ALIGN_CENTER);
+                        table.addCell(h);
                     });
-
-            q.getItems().forEach(it -> {
-                table.addCell(it.getArticle().getName());
-                table.addCell(it.getQuantity().toString());
-                table.addCell(String.format("%.2f €", it.getArticle().getPrice()));
+            for (QuoteItem it : q.getItems()) {
+                table.addCell(new Phrase(it.getArticle().getName(), labelFont));
+                table.addCell(new Phrase(it.getQuantity().toString(), labelFont));
+                table.addCell(new Phrase(it.getArticle().getMeasureUnit().toString(), labelFont));
+                table.addCell(new Phrase(
+                        String.format("%.2f €", it.getArticle().getPrice()),
+                        labelFont
+                ));
                 double lineTotal = it.getQuantity() * it.getArticle().getPrice();
-                table.addCell(String.format("%.2f €", lineTotal));
-            });
-
+                table.addCell(new Phrase(
+                        String.format("%.2f €", lineTotal),
+                        labelFont
+                ));
+            }
             doc.add(table);
 
-            double total = q.getItems().stream()
+            double preDiscount = q.getItems().stream()
                     .mapToDouble(it -> it.getQuantity() * it.getArticle().getPrice())
                     .sum();
-            if (q.getDiscount() > 0) {
+
+            Paragraph preDiscPara = new Paragraph(
+                    String.format("Bez rabata: %.2f €", preDiscount),
+                    labelFont
+            );
+            preDiscPara.setSpacingBefore(8f);
+            doc.add(preDiscPara);
+
+            double total = preDiscount;
+            if (q.getDiscount() != null && q.getDiscount() > 0) {
+
                 doc.add(new Paragraph(
                         String.format("Rabat: %d%%", q.getDiscount()),
-                        FontFactory.getFont(FontFactory.HELVETICA, 12)
+                        labelFont
                 ));
                 total = total * (100 - q.getDiscount()) / 100.0;
             }
-            Paragraph pTotal = new Paragraph("\nUkupno: "
-                    + String.format("%.2f €", total),
-                    FontFactory.getFont(FontFactory.HELVETICA_BOLD, 12));
+            Paragraph pTotal = new Paragraph(
+                    String.format("Ukupno: %.2f €", total),
+                    boldFont
+            );
             pTotal.setAlignment(Element.ALIGN_RIGHT);
+            doc.add(Chunk.NEWLINE);
             doc.add(pTotal);
 
             doc.close();
@@ -180,15 +225,18 @@ public class QuoteServiceImpl implements QuoteService {
             ByteArrayResource resource = new ByteArrayResource(baos.toByteArray());
             return ResponseEntity.ok()
                     .header(HttpHeaders.CONTENT_DISPOSITION,
-                            "attachment; filename=\"quote-" + q.getId() + ".pdf\"")
+                            "attachment; filename=\"ponuda-" + q.getId() + ".pdf\"")
                     .contentType(MediaType.APPLICATION_PDF)
                     .body(resource);
 
-        } catch (Exception e) {
+        } catch (IOException | DocumentException e) {
             throw new ResponseStatusException(
-                    HttpStatus.INTERNAL_SERVER_ERROR, "PDF generation failed", e);
+                    HttpStatus.INTERNAL_SERVER_ERROR,
+                    "Greška pri generiranju PDF-a", e
+            );
         }
     }
+
 
     @Override
     @Transactional(readOnly = true)
