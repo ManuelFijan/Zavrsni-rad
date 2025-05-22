@@ -1,23 +1,17 @@
 import React, {useEffect, useRef, useState} from "react";
-import {OPEN_SANS_REGULAR} from "../fonts/OpenSans.js";
 import {getProducts, Product} from "../services/ProductService";
 import {
     getQuotes,
     createQuote,
     Quote,
     QuoteItem,
-    getQuote,
     downloadQuotePdf
 } from "../services/QuoteService";
 import {
     getFolders,
     createFolder,
-    addQuoteToFolder,
-    Folder
+    Folder,
 } from "../services/FolderService";
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
-import "jspdf-autotable";
 
 const QuotesPage: React.FC = () => {
     const [products, setProducts] = useState<Product[]>([]);
@@ -180,71 +174,40 @@ const QuotesPage: React.FC = () => {
 
             const newQuoteId = await createQuote(nonZero, logoDataURL, +discount || 0);
 
-            const freshQuote = await getQuote(newQuoteId);
+            setIsModalOpen(false);
 
-            setQuotes(prev => [...prev, freshQuote]);
+            const refreshed: Quote[] = await getQuotes();
+            setQuotes(refreshed);
 
-            if (selectedFolderId) {
-                await addQuoteToFolder(selectedFolderId, freshQuote.id);
-            }
-
-            const pdfBlob = await downloadQuotePdf(freshQuote.id);
-            const blobUrl = URL.createObjectURL(pdfBlob);
-            window.open(blobUrl, "_blank");
+            const pdfBlob = await downloadQuotePdf(newQuoteId);
+            window.open(URL.createObjectURL(pdfBlob), "_blank");
 
             setSelectedItems([]);
-            setSelectedFolderId(null);
-            setLogoDataURL(null);
             setDiscount("");
-
+            setLogoDataURL(null);
+            setSelectedFolderId(null);
         } catch (err: any) {
             console.error(err);
-            alert("Greška pri kreiranju ponude: " + err.message);
+            alert("Greška");
         } finally {
             isSubmittingRef.current = false;
         }
     };
 
-    const handleGeneratePdf = () => {
-        const doc = new jsPDF();
-
-        if (logoDataURL) {
-            doc.addImage(logoDataURL, "PNG", 150, 10, 40, 20);
+    const handleDownloadQuote = async () => {
+        try {
+            const nonZero = selectedItems.filter(i => i.quantity > 0);
+            if (nonZero.length === 0) {
+                alert("Dodajte barem jedan proizvod.");
+                return;
+            }
+            const previewId = await createQuote(nonZero, logoDataURL, +discount || 0);
+            const blob = await downloadQuotePdf(previewId);
+            window.open(URL.createObjectURL(blob), "_blank");
+        } catch (err: any) {
+            console.error(err);
+            alert("Greška pri preuzimanju PDF-a: " + err.message);
         }
-        doc.addFileToVFS("OpenSans-Regular.ttf", OPEN_SANS_REGULAR);
-        doc.addFont("OpenSans-Regular.ttf", "OpenSans", "normal");
-        doc.setFont("OpenSans");
-        doc.setFontSize(16);
-        doc.text("Ponuda", 10, 10);
-        doc.setFontSize(10);
-        doc.text(`Datum: ${new Date().toLocaleDateString()}`, 10, 16);
-
-        doc.setFontSize(12);
-        let startY = 30;
-        doc.text("Naziv Proizvoda", 10, startY);
-        doc.text("Količina", 80, startY);
-        doc.text("Jed. Cijena (€)", 110, startY);
-        doc.text("Ukupno (€)", 150, startY);
-
-        let yOffset = startY + 10;
-        selectedItems.forEach((it) => {
-            const prod = products.find((p) => p.id === it.productId);
-            if (!prod) return;
-            const lineTotal = prod.price * it.quantity;
-
-            doc.text(prod.name, 10, yOffset);
-            doc.text(`${it.quantity}`, 80, yOffset);
-            doc.text(prod.price.toFixed(2), 110, yOffset);
-            doc.text(lineTotal.toFixed(2), 150, yOffset);
-
-            yOffset += 10;
-        });
-
-        const total = getTotal();
-        doc.setFontSize(14);
-        doc.text(`Ukupno: ${total.toFixed(2)} €`, 10, yOffset + 10);
-
-        doc.save("ponuda.pdf");
     };
 
     return (
@@ -443,7 +406,7 @@ const QuotesPage: React.FC = () => {
                                 Kreiraj ponudu
                             </button>
                             <button
-                                onClick={handleGeneratePdf}
+                                onClick={handleDownloadQuote}
                                 className="rounded bg-orange-600 px-4 py-2 text-white hover:bg-orange-700"
                             >
                                 Preuzmi PDF
