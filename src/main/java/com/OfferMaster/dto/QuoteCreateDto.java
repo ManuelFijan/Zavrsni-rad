@@ -5,12 +5,21 @@ import java.util.List;
 public class QuoteCreateDto {
     private String logoBase64;
     private List<QuoteItemRequestDto> items;
+    private Integer discount;
 
     public <T> QuoteCreateDto(Object o, List<T> ts) {
     }
 
     public QuoteCreateDto() {
 
+    }
+
+    public Integer getDiscount() {
+        return discount;
+    }
+
+    public void setDiscount(Integer discount) {
+        this.discount = discount;
     }
 
     public String getLogoBase64() {

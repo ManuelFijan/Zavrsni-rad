@@ -63,6 +63,7 @@ public class QuoteServiceImpl implements QuoteService {
         User user = currentUser();
         Quote q = new Quote();
         q.setUser(user);
+        q.setDiscount(dto.getDiscount() != null ? dto.getDiscount() : 0);
 
         if (dto.getLogoBase64() != null && !dto.getLogoBase64().isBlank()) {
             String base64 = dto.getLogoBase64();
@@ -161,6 +162,13 @@ public class QuoteServiceImpl implements QuoteService {
             double total = q.getItems().stream()
                     .mapToDouble(it -> it.getQuantity() * it.getArticle().getPrice())
                     .sum();
+            if (q.getDiscount() > 0) {
+                doc.add(new Paragraph(
+                        String.format("Rabat: %d%%", q.getDiscount()),
+                        FontFactory.getFont(FontFactory.HELVETICA, 12)
+                ));
+                total = total * (100 - q.getDiscount()) / 100.0;
+            }
             Paragraph pTotal = new Paragraph("\nUkupno: "
                     + String.format("%.2f €", total),
                     FontFactory.getFont(FontFactory.HELVETICA_BOLD, 12));
@@ -199,7 +207,8 @@ public class QuoteServiceImpl implements QuoteService {
                         .map(it -> new QuoteItemDto(it.getArticle().getArticleId(), it.getQuantity()))
                         .collect(Collectors.toList()),
                 q.getCreatedAt(),
-                q.getLogoUrl()
+                q.getLogoUrl(),
+                q.getDiscount()
         );
     }
 
@@ -217,7 +226,8 @@ public class QuoteServiceImpl implements QuoteService {
                                                 it.getQuantity()))
                                         .collect(Collectors.toList()),
                                 q.getCreatedAt(),
-                                q.getLogoUrl()
+                                q.getLogoUrl(),
+                                q.getDiscount()
                         )
                 ).collect(Collectors.toList());
     }

@@ -8,12 +8,22 @@ public class QuoteResponseDto {
     private List<QuoteItemDto> items;
     private Instant createdAt;
     private String logoUrl;
+    private Integer discount;
 
-    public QuoteResponseDto(Long id, List<QuoteItemDto> items, Instant createdAt, String logoUrl) {
+    public QuoteResponseDto(Long id, List<QuoteItemDto> items, Instant createdAt, String logoUrl, Integer discount) {
         this.id = id;
         this.items = items;
         this.createdAt = createdAt;
         this.logoUrl = logoUrl;
+        this.discount = discount;
+    }
+
+    public Integer getDiscount() {
+        return discount;
+    }
+
+    public void setDiscount(Integer discount) {
+        this.discount = discount;
     }
 
     public Long getId() {
