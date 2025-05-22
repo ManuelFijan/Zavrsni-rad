@@ -35,6 +35,8 @@ const QuotesPage: React.FC = () => {
 
     const [folderFilter, setFolderFilter] = useState<"all" | "none" | string>("all");
 
+    const [discount, setDiscount] = useState<number | "">("");
+
     const folderlessQuotes = quotes.filter(
         (q) => !folders.some((f) => f.quoteIds.includes(q.id))
     );
@@ -176,7 +178,7 @@ const QuotesPage: React.FC = () => {
                 return;
             }
 
-            const newQuoteId = await createQuote(nonZero, logoDataURL);
+            const newQuoteId = await createQuote(nonZero, logoDataURL, +discount || 0);
 
             const freshQuote = await getQuote(newQuoteId);
 
@@ -193,6 +195,7 @@ const QuotesPage: React.FC = () => {
             setSelectedItems([]);
             setSelectedFolderId(null);
             setLogoDataURL(null);
+            setDiscount("");
 
         } catch (err: any) {
             console.error(err);
@@ -301,6 +304,10 @@ const QuotesPage: React.FC = () => {
                                     <div className="mt-2 rounded border bg-white p-3 shadow-inner">
                                         {filteredProducts.map((p) => {
                                             const qtyStr = getQuantityString(p.id);
+                                            const qty = parseInt(qtyStr, 10) || 0;
+                                            const displayPrice = qty > 0
+                                                ? (p.price * qty).toFixed(2)
+                                                : p.price.toFixed(2);
                                             return (
                                                 <div
                                                     key={p.id}
@@ -328,7 +335,7 @@ const QuotesPage: React.FC = () => {
                                                         </button>
                                                     </div>
                                                     <span className="text-sm text-gray-600">
-                                                          {(p.price * (parseInt(qtyStr) || 0)).toFixed(2)} €
+                                                         {displayPrice} €
                                                     </span>
                                                 </div>
                                             );
@@ -363,6 +370,22 @@ const QuotesPage: React.FC = () => {
                                 )}
                             </div>
 
+                            <div className="flex items-center gap-3">
+                                <label className="font-medium">Rabat (%) (opc.):</label>
+                                <input
+                                    type="number"
+                                    min={0}
+                                    max={100}
+                                    placeholder="npr. 15"
+                                    value={discount}
+                                    onChange={e => {
+                                        const v = e.target.value;
+                                        setDiscount(v === "" ? "" : Math.max(0, Math.min(100, +v)));
+                                    }}
+                                    className="w-24 border rounded px-3 py-2"
+                                />
+                            </div>
+
                             <div className="flex items-center space-x-2">
                                 <select
                                     value={selectedFolderId ?? ""}
@@ -394,7 +417,15 @@ const QuotesPage: React.FC = () => {
 
                             <div className="rounded border bg-gray-50 p-3 text-sm">
                                 <p>Ukupno artikala: {selectedItems.reduce((sum, i) => sum + i.quantity, 0)}</p>
-                                <p>Ukupna cijena: {getTotal().toFixed(2)} €</p>
+                                <p>Bez rabata: {getTotal().toFixed(2)} €</p>
+                                {discount !== "" && (
+                                    <>
+                                        <p>Rabat: {discount}%</p>
+                                        <p>
+                                            Sa rabatom: {(getTotal() * (100 - (+discount)) / 100).toFixed(2)} €
+                                        </p>
+                                    </>
+                                )}
                             </div>
                         </div>
 
@@ -450,15 +481,22 @@ const QuotesPage: React.FC = () => {
                     <p className="text-sm text-gray-500">Nema ponuda za odabrani folder.</p>
                 ) : (
                     displayedQuotes.map((q) => {
-                        const total = q.items.reduce((sum, it) => {
-                            const prod = products.find((p) => p.id === it.productId);
-                            return prod ? sum + prod.price * it.quantity : sum;
-                        }, 0);
+                        const rawTotal = q.items.reduce((sum, it) => {
+                            const prod = products.find(p => p.id === it.productId)
+                            return prod ? sum + prod.price * it.quantity : sum
+                        }, 0)
+
+                        const discountValue = q.discount ?? 0
+                        const discountedTotal = rawTotal * (100 - discountValue) / 100
+
                         return (
                             <div key={q.id} className="border p-3 rounded mb-2">
                                 <p>ID Ponude: {q.id}</p>
                                 <p>Datum: {new Date(q.createdAt).toLocaleString()}</p>
-                                <p>Ukupno: {total.toFixed(2)} €</p>
+                                <p>Bez rabata: {rawTotal.toFixed(2)} €</p>
+                                {discountValue > 0 && <p>Rabat: {discountValue}%</p>}
+                                <p>Rabat: {discountValue}%</p>
+                                <p>Ukupno: {discountedTotal.toFixed(2)} €</p>
                                 <ul className="list-disc pl-5">
                                     {q.items.map((i) => {
                                         const prod = products.find((p) => p.id === i.productId);
