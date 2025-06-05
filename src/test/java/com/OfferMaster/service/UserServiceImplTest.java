@@ -17,7 +17,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.context.SecurityContextImpl;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.server.ResponseStatusException;
+
 import java.util.Optional;
+
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 
@@ -37,9 +39,9 @@ class UserServiceImplTest {
 
     @Test
     void registerUser_succeeds() {
-        var reg = new UserRegistrationDto(/*…*/);
+        var reg = new UserRegistrationDto();
         var user = new User();
-        var dto = new UserDto(/*…*/);
+        var dto = new UserDto();
         given(repo.findByEmail(any())).willReturn(Optional.empty());
         given(mapper.toEntity(eq(reg))).willReturn(user);
         given(enc.encode(any())).willReturn("hash");
@@ -51,11 +53,11 @@ class UserServiceImplTest {
 
     @Test
     void registerUser_duplicate_throws() {
-        var reg = new UserRegistrationDto(/*…*/);
+        var reg = new UserRegistrationDto();
         given(repo.findByEmail(any())).willReturn(Optional.of(new User()));
 
         assertThatThrownBy(() -> svc.registerUser(reg))
-                .isInstanceOf(RuntimeException.class);
+                .isInstanceOf(ResponseStatusException.class);
     }
 
     @Test
@@ -69,8 +71,8 @@ class UserServiceImplTest {
         given(enc.matches(any(), any())).willReturn(false);
 
         assertThatThrownBy(() -> svc.loginUser(req))
-                .isInstanceOf(RuntimeException.class)
-                .hasMessageContaining("Invalid");
+                .isInstanceOf(ResponseStatusException.class)
+                .hasMessageContaining("pogrešni");
     }
 
     @Test
@@ -80,8 +82,7 @@ class UserServiceImplTest {
         req.setPassword("pw");
         var user = new User();
         user.setPasswordHash("h");
-        var dto = new UserDto(/*…*/);
-        var resp = new LoginResponseDto("t", dto);
+        var dto = new UserDto();
         given(repo.findByEmail(any())).willReturn(Optional.of(user));
         given(enc.matches(any(), any())).willReturn(true);
         given(jwt.generateToken(any())).willReturn("t");
@@ -99,6 +100,7 @@ class UserServiceImplTest {
         ctx.setAuthentication(auth);
         SecurityContextHolder.setContext(ctx);
         given(repo.findByEmail("missing@user.com")).willReturn(Optional.empty());
+
         assertThatThrownBy(() -> svc.updateUserProfile(new UserProfileUpdateDto()))
                 .isInstanceOf(ResponseStatusException.class)
                 .hasMessageContaining("not found");

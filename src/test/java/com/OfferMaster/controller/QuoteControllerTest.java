@@ -2,48 +2,49 @@ package com.OfferMaster.controller;
 
 import com.OfferMaster.dto.QuoteCreateDto;
 import com.OfferMaster.dto.QuoteResponseDto;
+import com.OfferMaster.security.JwtUtil;
 import com.OfferMaster.service.EmailService;
 import com.OfferMaster.service.QuoteService;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.Collections;
+import java.time.Instant;
+import java.util.List;
+
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@ExtendWith(MockitoExtension.class)
+@WebMvcTest(QuoteController.class)
+@AutoConfigureMockMvc(addFilters = false)
 class QuoteControllerTest {
 
-    private MockMvc mockMvc;
+    @Autowired
+    MockMvc mvc;
 
-    @Mock
-    private QuoteService quoteService;
+    @MockitoBean
+    QuoteService quoteService;
 
-    @Mock
-    private EmailService emailService;
+    @MockitoBean
+    EmailService emailService;
+
+    @MockitoBean
+    JwtUtil jwtUtil;
 
     @InjectMocks
     private QuoteController quoteController;
-
-    @BeforeEach
-    void setUp() {
-        mockMvc = MockMvcBuilders
-                .standaloneSetup(quoteController)
-                .build();
-    }
 
     @Test
     void createQuote_returnsId() throws Exception {
@@ -51,7 +52,7 @@ class QuoteControllerTest {
 
         String body = "{\"logoBase64\":null,\"items\":[{\"articleId\":1,\"quantity\":3}]}";
 
-        mockMvc.perform(post("/api/quotes")
+        mvc.perform(post("/api/quotes")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(body))
                 .andExpect(status().isOk())
@@ -59,25 +60,59 @@ class QuoteControllerTest {
     }
 
     @Test
-    void listQuotes_returnsList() throws Exception {
-        QuoteResponseDto dto1 = new QuoteResponseDto(1L, Collections.emptyList(), null, null);
-        QuoteResponseDto dto2 = new QuoteResponseDto(2L, Collections.emptyList(), null, null);
-        when(quoteService.getAllQuotes()).thenReturn(Arrays.asList(dto1, dto2));
+    void listQuotes_shouldReturnListOfQuotes() throws Exception {
+        var quote1 = new QuoteResponseDto(
+                1L,
+                List.of(),
+                Instant.now(),
+                "http://example.com/logo.png",
+                10,
+                101L,
+                "Test Project 1",
+                "Description for quote 1"
+        );
 
-        mockMvc.perform(get("/api/quotes"))
+        var quote2 = new QuoteResponseDto(
+                2L,
+                List.of(),
+                Instant.now(),
+                null,
+                0,
+                null,
+                null,
+                "Description for quote 2"
+        );
+
+        given(quoteService.getAllQuotes()).willReturn(List.of(quote1, quote2));
+
+        mvc.perform(get("/api/quotes"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].id").value(1))
-                .andExpect(jsonPath("$[1].id").value(2));
+                .andExpect(jsonPath("$.length()").value(2))
+                .andExpect(jsonPath("$[0].id").value(1L))
+                .andExpect(jsonPath("$[0].projectName").value("Test Project 1"))
+                .andExpect(jsonPath("$[1].id").value(2L))
+                .andExpect(jsonPath("$[1].description").value("Description for quote 2"));
     }
 
     @Test
-    void getQuote_returnsDto() throws Exception {
-        QuoteResponseDto dto = new QuoteResponseDto(5L, Collections.emptyList(), null, null);
-        when(quoteService.getQuoteById(5L)).thenReturn(dto);
+    void getQuote_shouldReturnSingleQuote() throws Exception {
+        var quote1 = new QuoteResponseDto(
+                1L,
+                List.of(),
+                Instant.now(),
+                "http://example.com/logo.png",
+                10,
+                101L,
+                "Test Project 1",
+                "Description for quote 1"
+        );
 
-        mockMvc.perform(get("/api/quotes/5"))
+        given(quoteService.getQuoteById(1L)).willReturn(quote1);
+
+        mvc.perform(get("/api/quotes/1"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(5));
+                .andExpect(jsonPath("$.id").value(1L))
+                .andExpect(jsonPath("$.projectName").value("Test Project 1"));
     }
 
     @Test
@@ -90,7 +125,7 @@ class QuoteControllerTest {
                 .body(resource);
         when(quoteService.getQuotePdf(1L)).thenReturn(resp);
 
-        mockMvc.perform(get("/api/quotes/1/pdf"))
+        mvc.perform(get("/api/quotes/1/pdf"))
                 .andExpect(status().isOk())
                 .andExpect(header().string("Content-Disposition", "attachment; filename=quote-1.pdf"))
                 .andExpect(content().contentType(MediaType.APPLICATION_PDF));
@@ -100,7 +135,7 @@ class QuoteControllerTest {
     void sendQuoteByEmail_invokesEmailService() throws Exception {
         doNothing().when(emailService).sendQuoteEmail("a@b.com", "Name", 3L);
 
-        mockMvc.perform(post("/api/quotes/3/email")
+        mvc.perform(post("/api/quotes/3/email")
                         .param("recipientEmail", "a@b.com")
                         .param("recipientName", "Name"))
                 .andExpect(status().isOk());
