@@ -24,6 +24,21 @@ import {
     XMarkIcon
 } from "@heroicons/react/24/outline";
 import {sendEmail} from "../services/EmailService";
+import {startOfDay, endOfDay} from 'date-fns';
+
+type SortField = "createdAt" | "id" | "totalAmount";
+type SortOrder = "asc" | "desc";
+
+const LoadingSpinner: React.FC = () => (
+    <div className="flex justify-center items-center py-20">
+        <div
+            className="animate-spin rounded-full h-12 w-12 border-4 border-gray-200 border-t-orange-500"
+            role="status"
+        >
+            <span className="sr-only">Učitavanje...</span>
+        </div>
+    </div>
+);
 
 const QuotesPage: React.FC = () => {
     const [products, setProducts] = useState<Product[]>([]);
@@ -36,8 +51,13 @@ const QuotesPage: React.FC = () => {
     const [isQuoteModalOpen, setIsQuoteModalOpen] = useState(false);
     const [discount, setDiscount] = useState<number | "">("");
     const [selectedProjectIdForQuote, setSelectedProjectIdForQuote] = useState<string>("");
+    const [newQuoteDescription, setNewQuoteDescription] = useState<string>("");
 
     const [projectFilter, setProjectFilter] = useState<"all" | "none" | string>("all");
+    const [startDateFilter, setStartDateFilter] = useState<string>("");
+    const [endDateFilter, setEndDateFilter] = useState<string>("");
+    const [sortField, setSortField] = useState<SortField>("createdAt");
+    const [sortOrder, setSortOrder] = useState<SortOrder>("desc");
 
     const [isEmailModalOpen, setIsEmailModalOpen] = useState(false);
     const [quoteForEmail, setQuoteForEmail] = useState<Quote | null>(null);
@@ -46,24 +66,17 @@ const QuotesPage: React.FC = () => {
     const [emailFormErrors, setEmailFormErrors] = useState<{ email?: string }>({});
     const [isSendingEmail, setIsSendingEmail] = useState(false);
 
+    const [isLoadingInitialData, setIsLoadingInitialData] = useState<boolean>(true);
+
     const [isProjectModalOpen, setIsProjectModalOpen] = useState<boolean>(false);
     const [currentEditingProject, setCurrentEditingProject] = useState<Project | null>(null);
     const [projectFormData, setProjectFormData] = useState<Partial<ProjectCreatePayload & {
         imageUrlFile?: File | null
     }>>({});
 
-    const projectlessQuotes = quotes.filter(q => !q.projectId);
-
-    const displayedQuotes = React.useMemo(() => {
-        if (projectFilter === "all") return quotes;
-        if (projectFilter === "none") return projectlessQuotes;
-        const pid = parseInt(projectFilter, 10);
-        return quotes.filter((q) => q.projectId === pid);
-    }, [projectFilter, quotes, projectlessQuotes]);
-
-
     useEffect(() => {
         (async () => {
+            setIsLoadingInitialData(true);
             try {
                 const [fetchedProducts, fetchedQuotes, fetchedProjects] = await Promise.all([
                     getProducts(),
@@ -75,9 +88,70 @@ const QuotesPage: React.FC = () => {
                 setProjects(fetchedProjects);
             } catch (err) {
                 console.error("Error fetching initial data:", err);
+            } finally {
+                setIsLoadingInitialData(false);
             }
         })();
     }, []);
+
+    const displayedQuotes = React.useMemo(() => {
+        let filtered = [...quotes];
+
+        if (projectFilter === "none") {
+            filtered = filtered.filter(q => !q.projectId);
+        } else if (projectFilter !== "all") {
+            const pid = parseInt(projectFilter, 10);
+            filtered = filtered.filter((q) => q.projectId === pid);
+        }
+
+        if (startDateFilter) {
+            const filterStartDate = startOfDay(new Date(startDateFilter));
+            filtered = filtered.filter(q => new Date(q.createdAt) >= filterStartDate);
+        }
+        if (endDateFilter) {
+            const filterEndDate = endOfDay(new Date(endDateFilter));
+            filtered = filtered.filter(q => new Date(q.createdAt) <= filterEndDate);
+        }
+
+        const calculateQuoteTotal = (quote: Quote): number => {
+            const rawTotal = quote.items.reduce((sum, it) => {
+                const prod = products.find(p => p.id === it.productId);
+                return prod ? sum + prod.price * it.quantity : sum;
+            }, 0);
+            const discountValue = quote.discount ?? 0;
+            return rawTotal * (100 - discountValue) / 100;
+        };
+
+        filtered.sort((a, b) => {
+            let valA: number | string, valB: number | string;
+            switch (sortField) {
+                case "id":
+                    valA = a.id;
+                    valB = b.id;
+                    break;
+                case "totalAmount":
+                    valA = calculateQuoteTotal(a);
+                    valB = calculateQuoteTotal(b);
+                    break;
+                case "createdAt":
+                default:
+                    valA = new Date(a.createdAt).getTime();
+                    valB = new Date(b.createdAt).getTime();
+                    break;
+            }
+
+            if (valA < valB) {
+                return sortOrder === "asc" ? -1 : 1;
+            }
+            if (valA > valB) {
+                return sortOrder === "asc" ? 1 : -1;
+            }
+            return 0;
+        });
+
+        return filtered;
+    }, [quotes, projectFilter, startDateFilter, endDateFilter, sortField, sortOrder, products]);
+
 
     const filteredProducts = searchTerm.trim()
         ? products.filter((p) =>
@@ -174,7 +248,7 @@ const QuotesPage: React.FC = () => {
                 return;
             }
             const projectId = selectedProjectIdForQuote ? parseInt(selectedProjectIdForQuote, 10) : undefined;
-            const newQuoteId = await createQuote(nonZero, logoDataURL, +discount || 0, projectId);
+            const newQuoteId = await createQuote(nonZero, logoDataURL, +discount || 0, projectId, newQuoteDescription);
 
             setIsQuoteModalOpen(false);
             const refreshedQuotes = await getQuotes();
@@ -192,6 +266,7 @@ const QuotesPage: React.FC = () => {
             setDiscount("");
             setLogoDataURL(null);
             setSelectedProjectIdForQuote("");
+            setNewQuoteDescription("");
         } catch (err: any) {
             console.error(err);
             alert("Greška pri kreiranju ponude: " + (err.response?.data?.message || err.message));
@@ -326,7 +401,6 @@ const QuotesPage: React.FC = () => {
             if (removeCurrentImage) payload.imageUrl = undefined;
         }
 
-
         try {
             if (currentEditingProject) {
                 const updated = await updateProject(currentEditingProject.id, payload as ProjectUpdatePayload);
@@ -362,6 +436,7 @@ const QuotesPage: React.FC = () => {
                             setDiscount("");
                             setLogoDataURL(null);
                             setSelectedProjectIdForQuote("");
+                            setNewQuoteDescription("");
                             setIsQuoteModalOpen(true);
                         }}
                         className="inline-flex items-center space-x-2 rounded bg-orange-600 px-4 py-2 text-sm font-medium text-white hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500"
@@ -372,105 +447,177 @@ const QuotesPage: React.FC = () => {
                 </div>
             </div>
 
-            <div className="mb-6 flex items-center space-x-4">
-                <label htmlFor="projectFilter" className="text-sm font-medium text-gray-700">
-                    Prikaži ponude za projekt:
-                </label>
-                <select
-                    id="projectFilter"
-                    value={projectFilter}
-                    onChange={(e) => setProjectFilter(e.target.value)}
-                    className="rounded-md border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500 sm:text-sm py-2 pl-3 pr-10"
-                >
-                    <option value="all">Sve ponude (svi projekti)</option>
-                    <option value="none">Ponude bez projekta</option>
-                    {projects.map((p) => (
-                        <option key={p.id} value={p.id.toString()}>
-                            {p.name}
-                        </option>
-                    ))}
-                </select>
-                {projectFilter !== "all" && projectFilter !== "none" && projects.find(p => p.id === parseInt(projectFilter)) && (
-                    <button onClick={() => openProjectModal(projects.find(p => p.id === parseInt(projectFilter))!)}
-                            className="p-1 text-blue-600 hover:text-blue-800" title="Uredi odabrani projekt">
-                        <PencilIcon className="h-4 w-4"/>
-                    </button>
-                )}
-            </div>
-            <hr className="my-4"/>
-
-            <div>
-                {displayedQuotes.length === 0 ? (
-                    <p className="text-sm text-gray-500">Nema ponuda za odabrani filter.</p>
-                ) : (
-                    displayedQuotes.map((q) => {
-                        const rawTotal = q.items.reduce((sum, it) => {
-                            const prod = products.find(p => p.id === it.productId);
-                            return prod ? sum + prod.price * it.quantity : sum;
-                        }, 0);
-                        const discountValue = q.discount ?? 0;
-                        const discountedTotal = rawTotal * (100 - discountValue) / 100;
-                        const projectForQuote = q.projectId ? projects.find(p => p.id === q.projectId) : null;
-
-                        return (
-                            <div key={q.id} className="border p-4 rounded-lg shadow hover:shadow-md mb-3 bg-white">
-                                <div className="flex justify-between items-start">
-                                    <div>
-                                        <h3 className="text-lg font-semibold text-orange-600">Ponuda ID: {q.id}</h3>
-                                        {projectForQuote &&
-                                            <p className="text-sm text-gray-600 font-medium">Projekt: {projectForQuote.name}</p>}
-                                        <p className="text-xs text-gray-500">Datum: {new Date(q.createdAt).toLocaleString('hr-HR', {
-                                            dateStyle: 'short',
-                                            timeStyle: 'short'
-                                        })}</p>
-                                        {q.logoUrl &&
-                                            <img src={q.logoUrl} alt="Logo ponude" className="max-h-12 my-2 border"/>}
-                                    </div>
-                                    <div className="flex space-x-1">
+            {isLoadingInitialData ? (
+                <LoadingSpinner></LoadingSpinner>
+            ) : (
+                <>
+                    <div className="mb-6 p-4 bg-white shadow rounded-lg">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 items-end">
+                            <div>
+                                <label htmlFor="projectFilter" className="block text-sm font-medium text-gray-700 mb-1">
+                                    Projekt:
+                                </label>
+                                <div className="flex items-center">
+                                    <select
+                                        id="projectFilter"
+                                        value={projectFilter}
+                                        onChange={(e) => setProjectFilter(e.target.value)}
+                                        className="w-full rounded-md border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500 sm:text-sm py-2 pl-3 pr-10"
+                                    >
+                                        <option value="all">Sve ponude (svi projekti)</option>
+                                        <option value="none">Ponude bez projekta</option>
+                                        {projects.map((p) => (
+                                            <option key={p.id} value={p.id.toString()}>
+                                                {p.name}
+                                            </option>
+                                        ))}
+                                    </select>
+                                    {projectFilter !== "all" && projectFilter !== "none" && projects.find(p => p.id === parseInt(projectFilter)) && (
                                         <button
-                                            onClick={() => handleDownloadSelectedQuotePdf(q.id)}
-                                            className="p-2 text-gray-500 hover:text-green-600 focus:outline-none"
-                                            title="Preuzmi PDF"
-                                        >
-                                            <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" strokeWidth="1.5"
-                                                 stroke="currentColor">
-                                                <path strokeLinecap="round" strokeLinejoin="round"
-                                                      d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/>
-                                            </svg>
+                                            onClick={() => openProjectModal(projects.find(p => p.id === parseInt(projectFilter))!)}
+                                            className="ml-2 p-1 text-blue-600 hover:text-blue-800"
+                                            title="Uredi odabrani projekt">
+                                            <PencilIcon className="h-4 w-4"/>
                                         </button>
-                                        <button
-                                            onClick={() => handleOpenEmailModal(q)}
-                                            className="p-2 text-gray-500 hover:text-orange-600 focus:outline-none"
-                                            title="Pošalji ponudu emailom"
-                                        >
-                                            <EnvelopeIcon className="h-6 w-6"/>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div className="mt-2">
-                                    <p className="text-sm">Bez rabata: <span
-                                        className="font-medium">{rawTotal.toFixed(2)} €</span></p>
-                                    {discountValue > 0 && (<p className="text-sm">Rabat: <span
-                                        className="font-medium">{discountValue}%</span></p>)}
-                                    <p className="text-sm font-bold">Ukupno: <span
-                                        className="text-orange-700">{discountedTotal.toFixed(2)} €</span></p>
-                                    <details className="text-xs mt-1 text-gray-600">
-                                        <summary className="cursor-pointer hover:underline">Prikaži stavke</summary>
-                                        <ul className="list-disc pl-5 mt-1">
-                                            {q.items.map((i) => {
-                                                const prod = products.find((p) => p.id === i.productId);
-                                                return prod ? (
-                                                        <li key={prod.id + '-' + i.productId}>{prod.name} x {i.quantity} = {(prod.price * i.quantity).toFixed(2)} €</li>) :
-                                                    <li key={i.productId}>Nepoznat proizvod</li>;
-                                            })}
-                                        </ul>
-                                    </details>
+                                    )}
                                 </div>
                             </div>
-                        );
-                    })
-                )}
-            </div>
+
+                            <div>
+                                <label htmlFor="startDateFilter"
+                                       className="block text-sm font-medium text-gray-700 mb-1">Datum
+                                    od:</label>
+                                <input
+                                    type="date"
+                                    id="startDateFilter"
+                                    value={startDateFilter}
+                                    onChange={(e) => setStartDateFilter(e.target.value)}
+                                    className="w-full rounded-md border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500 sm:text-sm py-2 px-3"
+                                />
+                            </div>
+                            <div>
+                                <label htmlFor="endDateFilter" className="block text-sm font-medium text-gray-700 mb-1">Datum
+                                    do:</label>
+                                <input
+                                    type="date"
+                                    id="endDateFilter"
+                                    value={endDateFilter}
+                                    onChange={(e) => setEndDateFilter(e.target.value)}
+                                    className="w-full rounded-md border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500 sm:text-sm py-2 px-3"
+                                />
+                            </div>
+
+                            <div>
+                                <label htmlFor="sortField" className="block text-sm font-medium text-gray-700 mb-1">Sortiraj
+                                    po:</label>
+                                <select
+                                    id="sortField"
+                                    value={sortField}
+                                    onChange={(e) => setSortField(e.target.value as SortField)}
+                                    className="w-full rounded-md border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500 sm:text-sm py-2 pl-3 pr-10"
+                                >
+                                    <option value="createdAt">Datum</option>
+                                    <option value="id">ID ponude</option>
+                                    <option value="totalAmount">Ukupan iznos</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label htmlFor="sortOrder"
+                                       className="block text-sm font-medium text-gray-700 mb-1">Redoslijed:</label>
+                                <select
+                                    id="sortOrder"
+                                    value={sortOrder}
+                                    onChange={(e) => setSortOrder(e.target.value as SortOrder)}
+                                    className="w-full rounded-md border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500 sm:text-sm py-2 pl-3 pr-10"
+                                >
+                                    <option value="asc">Uzlazno</option>
+                                    <option value="desc">Silazno</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        {displayedQuotes.length === 0 ? (
+                            <p className="text-center text-sm text-gray-500 py-10">Nema ponuda za odabrane filtere.</p>
+                        ) : (
+                            displayedQuotes.map((q) => {
+                                const rawTotal = q.items.reduce((sum, it) => {
+                                    const prod = products.find(p => p.id === it.productId);
+                                    return prod ? sum + prod.price * it.quantity : sum;
+                                }, 0);
+                                const discountValue = q.discount ?? 0;
+                                const discountedTotal = rawTotal * (100 - discountValue) / 100;
+                                const projectForQuote = q.projectId ? projects.find(p => p.id === q.projectId) : null;
+
+                                return (
+                                    <div key={q.id}
+                                         className="border p-4 rounded-lg shadow hover:shadow-md mb-3 bg-white">
+                                        <div className="flex justify-between items-start">
+                                            <div>
+                                                <h3 className="text-lg font-semibold text-orange-600">Ponuda
+                                                    ID: {q.id}</h3>
+                                                {projectForQuote &&
+                                                    <p className="text-sm text-gray-600 font-medium">Projekt: {projectForQuote.name}</p>}
+                                                <p className="text-xs text-gray-500">Datum: {new Date(q.createdAt).toLocaleString('hr-HR', {
+                                                    dateStyle: 'short',
+                                                    timeStyle: 'short'
+                                                })}</p>
+                                                {q.logoUrl &&
+                                                    <img src={q.logoUrl} alt="Logo ponude"
+                                                         className="max-h-12 my-2 border"/>}
+                                                {q.description && (
+                                                    <p className="text-xs text-gray-500 mt-1 italic">Opis: {q.description}</p>)}
+                                            </div>
+                                            <div className="flex space-x-1">
+                                                <button
+                                                    onClick={() => handleDownloadSelectedQuotePdf(q.id)}
+                                                    className="p-2 text-gray-500 hover:text-green-600 focus:outline-none"
+                                                    title="Preuzmi PDF"
+                                                >
+                                                    <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                                                         strokeWidth="1.5"
+                                                         stroke="currentColor">
+                                                        <path strokeLinecap="round" strokeLinejoin="round"
+                                                              d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/>
+                                                    </svg>
+                                                </button>
+                                                <button
+                                                    onClick={() => handleOpenEmailModal(q)}
+                                                    className="p-2 text-gray-500 hover:text-orange-600 focus:outline-none"
+                                                    title="Pošalji ponudu emailom"
+                                                >
+                                                    <EnvelopeIcon className="h-6 w-6"/>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div className="mt-2">
+                                            <p className="text-sm">Bez rabata: <span
+                                                className="font-medium">{rawTotal.toFixed(2)} €</span></p>
+                                            {discountValue > 0 && (<p className="text-sm">Rabat: <span
+                                                className="font-medium">{discountValue}%</span></p>)}
+                                            <p className="text-sm font-bold">Ukupno: <span
+                                                className="text-orange-700">{discountedTotal.toFixed(2)} €</span></p>
+                                            <details className="text-xs mt-1 text-gray-600">
+                                                <summary className="cursor-pointer hover:underline">Prikaži stavke
+                                                </summary>
+                                                <ul className="list-disc pl-5 mt-1">
+                                                    {q.items.map((i) => {
+                                                        const prod = products.find((p) => p.id === i.productId);
+                                                        return prod ? (
+                                                                <li key={prod.id + '-' + i.productId}>{prod.name} x {i.quantity} = {(prod.price * i.quantity).toFixed(2)} €</li>) :
+                                                            <li key={i.productId}>Nepoznat proizvod</li>;
+                                                    })}
+                                                </ul>
+                                            </details>
+                                        </div>
+                                    </div>
+                                );
+                            })
+                        )}
+                    </div>
+                </>
+            )}
 
             {isQuoteModalOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75 px-4 py-6">
@@ -558,6 +705,20 @@ const QuotesPage: React.FC = () => {
                                         <option key={p.id} value={p.id.toString()}>{p.name}</option>
                                     ))}
                                 </select>
+                            </div>
+                            <div>
+                                <label htmlFor="quoteDescription" className="block text-sm font-medium text-gray-700">
+                                    Opis ponude (opcionalno)
+                                </label>
+                                <textarea
+                                    id="quoteDescription"
+                                    name="quoteDescription"
+                                    rows={3}
+                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500 sm:text-sm"
+                                    value={newQuoteDescription}
+                                    onChange={(e) => setNewQuoteDescription(e.target.value)}
+                                    placeholder="Unesite kratak opis ponude..."
+                                />
                             </div>
                             <div className="rounded border border-gray-200 bg-gray-50 p-3 text-sm mt-2"><p>Ukupno
                                 artikala: {selectedItems.reduce((sum, i) => sum + i.quantity, 0)}</p> <p>Bez

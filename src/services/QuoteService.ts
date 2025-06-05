@@ -14,6 +14,7 @@ export interface Quote {
     discount?: number;
     projectId?: number;
     projectName?: string;
+    description?: string;
 }
 
 export async function getQuotes(): Promise<Quote[]> {
@@ -25,13 +26,15 @@ export const createQuote = async (
     items: QuoteItem[],
     logoBase64: string | null,
     discount: number,
-    projectId?: number
+    projectId?: number,
+    description?: string
 ): Promise<number> => {
     const payload = {
         items: items.map(item => ({articleId: item.productId, quantity: item.quantity})),
         logoBase64,
         discount,
-        projectId
+        projectId,
+        description
     };
     const response = await apiClient.post<number>("/api/quotes", payload);
     return response.data;
