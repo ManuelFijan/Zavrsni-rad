@@ -40,17 +40,19 @@ public class QuoteServiceImpl implements QuoteService {
     private final ArticleRepository articleRepo;
     private final WebClient supabaseClient;
     private final UserRepository userRepository;
+    private final ProjectRepository projectRepository;
 
     @Autowired
     public QuoteServiceImpl(
             QuoteRepository quoteRepo,
             ArticleRepository articleRepo,
-            WebClient supabaseClient, UserRepository userRepository
+            WebClient supabaseClient, UserRepository userRepository, ProjectRepository projectRepository
     ) {
         this.quoteRepo = quoteRepo;
         this.articleRepo = articleRepo;
         this.supabaseClient = supabaseClient;
         this.userRepository = userRepository;
+        this.projectRepository = projectRepository;
     }
 
     @Override
@@ -76,7 +78,7 @@ public class QuoteServiceImpl implements QuoteService {
             if (comma >= 0) base64 = base64.substring(comma + 1);
             byte[] imageBytes = Base64.getDecoder().decode(base64);
 
-            String path = "logos/" + System.currentTimeMillis() + ".png";
+            String path = "logos/" + user.getUserId() + "/" + System.currentTimeMillis() + ".png";
 
             supabaseClient.post()
                     .uri(uriBuilder -> uriBuilder
@@ -104,6 +106,12 @@ public class QuoteServiceImpl implements QuoteService {
             q.setLogoUrl(publicUrl);
         }
 
+        if (dto.getProjectId() != null) {
+            Project project = projectRepository.findById(dto.getProjectId())
+                    .filter(p -> p.getUser().getUserId().equals(user.getUserId()))
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Projekt nije pronađen ili nije dostupan."));
+            q.setProject(project);
+        }
 
         q.setItems(dto.getItems().stream().map(itemDto -> {
             Article art = articleRepo.findById(itemDto.getArticleId())
@@ -249,6 +257,9 @@ public class QuoteServiceImpl implements QuoteService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Quote not found");
         }
 
+        Long projectId = (q.getProject() != null) ? q.getProject().getId() : null;
+        String projectName = (q.getProject() != null) ? q.getProject().getName() : null;
+
         return new QuoteResponseDto(
                 q.getId(),
                 q.getItems().stream()
@@ -256,7 +267,9 @@ public class QuoteServiceImpl implements QuoteService {
                         .collect(Collectors.toList()),
                 q.getCreatedAt(),
                 q.getLogoUrl(),
-                q.getDiscount()
+                q.getDiscount(),
+                projectId,
+                projectName
         );
     }
 
@@ -266,17 +279,22 @@ public class QuoteServiceImpl implements QuoteService {
         User user = currentUser();
 
         return quoteRepo.findByUser(user).stream()
-                .map(q -> new QuoteResponseDto(
-                                q.getId(),
-                                q.getItems().stream()
-                                        .map(it -> new QuoteItemDto(
-                                                it.getArticle().getArticleId(),
-                                                it.getQuantity()))
-                                        .collect(Collectors.toList()),
-                                q.getCreatedAt(),
-                                q.getLogoUrl(),
-                                q.getDiscount()
-                        )
-                ).collect(Collectors.toList());
+                .map(q -> {
+                    Long projectId = (q.getProject() != null) ? q.getProject().getId() : null;
+                    String projectName = (q.getProject() != null) ? q.getProject().getName() : null;
+                    return new QuoteResponseDto(
+                            q.getId(),
+                            q.getItems().stream()
+                                    .map(it -> new QuoteItemDto(
+                                            it.getArticle().getArticleId(),
+                                            it.getQuantity()))
+                                    .collect(Collectors.toList()),
+                            q.getCreatedAt(),
+                            q.getLogoUrl(),
+                            q.getDiscount(),
+                            projectId,
+                            projectName
+                    );
+                }).collect(Collectors.toList());
     }
 }

@@ -1,7 +1,6 @@
 package com.OfferMaster.model;
 
 import jakarta.persistence.*;
-
 import java.time.Instant;
 import java.util.List;
 
@@ -27,6 +26,18 @@ public class Quote {
 
     @OneToMany(mappedBy = "quote", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<QuoteItem> items;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "project_id", nullable = true)
+    private Project project;
+
+    public Project getProject() {
+        return project;
+    }
+
+    public void setProject(Project project) {
+        this.project = project;
+    }
 
     public Integer getDiscount() {
         return discount;

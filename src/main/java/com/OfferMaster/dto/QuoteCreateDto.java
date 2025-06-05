@@ -6,12 +6,21 @@ public class QuoteCreateDto {
     private String logoBase64;
     private List<QuoteItemRequestDto> items;
     private Integer discount;
+    private Long projectId;
 
     public <T> QuoteCreateDto(Object o, List<T> ts) {
     }
 
     public QuoteCreateDto() {
 
+    }
+
+    public Long getProjectId() {
+        return projectId;
+    }
+
+    public void setProjectId(Long projectId) {
+        this.projectId = projectId;
     }
 
     public Integer getDiscount() {

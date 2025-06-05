@@ -9,6 +9,18 @@ public class QuoteResponseDto {
     private Instant createdAt;
     private String logoUrl;
     private Integer discount;
+    private Long projectId;
+    private String projectName;
+
+    public QuoteResponseDto(Long id, List<QuoteItemDto> items, Instant createdAt, String logoUrl, Integer discount, Long projectId, String projectName) {
+        this.id = id;
+        this.items = items;
+        this.createdAt = createdAt;
+        this.logoUrl = logoUrl;
+        this.discount = discount;
+        this.projectId = projectId;
+        this.projectName = projectName;
+    }
 
     public QuoteResponseDto(Long id, List<QuoteItemDto> items, Instant createdAt, String logoUrl, Integer discount) {
         this.id = id;
@@ -16,6 +28,22 @@ public class QuoteResponseDto {
         this.createdAt = createdAt;
         this.logoUrl = logoUrl;
         this.discount = discount;
+    }
+
+    public Long getProjectId() {
+        return projectId;
+    }
+
+    public void setProjectId(Long projectId) {
+        this.projectId = projectId;
+    }
+
+    public String getProjectName() {
+        return projectName;
+    }
+
+    public void setProjectName(String projectName) {
+        this.projectName = projectName;
     }
 
     public Integer getDiscount() {
