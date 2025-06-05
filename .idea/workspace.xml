@@ -4,10 +4,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3694cb8b-40c4-4407-bcc1-59c645812f6b" name="Changes" comment="slanje emaila prebačenu u ikonicu kraj svake ponude, porađeno na prikazu ponuda">
+    <list default="true" id="3694cb8b-40c4-4407-bcc1-59c645812f6b" name="Changes" comment="rad na kalendaru">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/Calendar.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/Calendar.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/services/CalendarService.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/services/CalendarService.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/HomePage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/HomePage.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/ProjectsPage.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/QuotesPage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/QuotesPage.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/services/ProjectService.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/services/ProjectService.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/services/QuoteService.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/services/QuoteService.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -154,7 +157,7 @@
       <workItem from="1748254846255" duration="48000" />
       <workItem from="1748844383520" duration="3769000" />
       <workItem from="1748857096113" duration="2125000" />
-      <workItem from="1749104767938" duration="5924000" />
+      <workItem from="1749104767938" duration="8115000" />
     </task>
     <task id="LOCAL-00001" summary="inicijalni commit">
       <option name="closed" value="true" />
@@ -332,7 +335,15 @@
       <option name="project" value="LOCAL" />
       <updated>1749131282280</updated>
     </task>
-    <option name="localTasksCounter" value="23" />
+    <task id="LOCAL-00023" summary="rad na kalendaru">
+      <option name="closed" value="true" />
+      <created>1749134469432</created>
+      <option name="number" value="00023" />
+      <option name="presentableId" value="LOCAL-00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1749134469432</updated>
+    </task>
+    <option name="localTasksCounter" value="24" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -372,6 +383,7 @@
     <MESSAGE value="omogućeno dodavanje rabata u ponude" />
     <MESSAGE value="formatiranje ponuda" />
     <MESSAGE value="slanje emaila prebačenu u ikonicu kraj svake ponude, porađeno na prikazu ponuda" />
-    <option name="LAST_COMMIT_MESSAGE" value="slanje emaila prebačenu u ikonicu kraj svake ponude, porađeno na prikazu ponuda" />
+    <MESSAGE value="rad na kalendaru" />
+    <option name="LAST_COMMIT_MESSAGE" value="rad na kalendaru" />
   </component>
 </project>

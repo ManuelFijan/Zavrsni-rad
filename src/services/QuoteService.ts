@@ -12,6 +12,8 @@ export interface Quote {
     logoUrl?: string;
     folderId?: number;
     discount?: number;
+    projectId?: number;
+    projectName?: string;
 }
 
 export async function getQuotes(): Promise<Quote[]> {
@@ -19,23 +21,21 @@ export async function getQuotes(): Promise<Quote[]> {
     return data;
 }
 
-export async function createQuote(
+export const createQuote = async (
     items: QuoteItem[],
     logoBase64: string | null,
-    discount: number | null,
-): Promise<number> {
-    const dtoItems = items.map(i => ({
-        articleId: i.productId,
-        quantity: i.quantity
-    }));
-
-    const {data: newQuoteId} = await apiClient.post<number>(
-        "/api/quotes",
-        {items: dtoItems, logoBase64, discount}
-    );
-
-    return newQuoteId;
-}
+    discount: number,
+    projectId?: number
+): Promise<number> => {
+    const payload = {
+        items: items.map(item => ({articleId: item.productId, quantity: item.quantity})),
+        logoBase64,
+        discount,
+        projectId
+    };
+    const response = await apiClient.post<number>("/api/quotes", payload);
+    return response.data;
+};
 
 export async function downloadQuotePdf(quoteId: number): Promise<Blob> {
     const resp = await apiClient.get(`/api/quotes/${quoteId}/pdf`, {
@@ -45,6 +45,6 @@ export async function downloadQuotePdf(quoteId: number): Promise<Blob> {
 }
 
 export async function getQuote(id: number): Promise<Quote> {
-    const { data } = await apiClient.get<Quote>(`/api/quotes/${id}`);
+    const {data} = await apiClient.get<Quote>(`/api/quotes/${id}`);
     return data;
 }

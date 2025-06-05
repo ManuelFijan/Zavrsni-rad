@@ -1,10 +1,9 @@
 import React, {useEffect, useState} from 'react';
-import { Disclosure, Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
-import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline';
+import {Disclosure, Menu, MenuButton, MenuItem, MenuItems} from '@headlessui/react';
+import {Bars3Icon, BellIcon, XMarkIcon} from '@heroicons/react/24/outline';
 import CalendarPage from '../components/Calendar';
-import ProjectsPage from "./ProjectsPage";
 import ProductsPage from "./ProductsPage";
-import { Link, useNavigate } from 'react-router-dom';
+import {Link, useNavigate} from 'react-router-dom';
 import QuotesPage from "./QuotesPage";
 import {clearToken, getToken} from "../services/AuthSession";
 
@@ -15,15 +14,14 @@ const user = {
 };
 
 const navigation = [
-    { name: 'Ponude', href: '#', current: false },
-    { name: 'Projekti', href: '#', current: false },
-    { name: 'Kalendar', href: '#', current: false },
-    { name: 'Baza proizvoda', href: '#', current: false },
+    {name: 'Ponude', href: '#', current: false},
+    {name: 'Kalendar', href: '#', current: false},
+    {name: 'Baza proizvoda', href: '#', current: false},
 ];
 
 const userNavigation = [
-    { name: 'Vaš profil', href: '/profile' },
-    { name: 'Odjava', href: '/' },
+    {name: 'Vaš profil', href: '/profile'},
+    {name: 'Odjava', href: '/'},
 ];
 
 function classNames(...classes: string[]): string {
@@ -53,7 +51,7 @@ function HomePage() {
         <div className="min-h-full flex flex-col">
             {/* navigation */}
             <Disclosure as="nav" className="bg-gray-800">
-                {({ open }) => (
+                {({open}) => (
                     <>
                         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                             <div className="flex h-16 items-center justify-between">
@@ -118,7 +116,7 @@ function HomePage() {
                                             >
                                                 {userNavigation.map((item) => (
                                                     <MenuItem key={item.name}>
-                                                        {({ active }) => {
+                                                        {({active}) => {
                                                             if (item.name === "Odjava") {
                                                                 return (
                                                                     <button
@@ -162,9 +160,9 @@ function HomePage() {
                                     >
                                         <span className="sr-only">Open main menu</span>
                                         {open ? (
-                                            <XMarkIcon className="block h-6 w-6" aria-hidden="true" />
+                                            <XMarkIcon className="block h-6 w-6" aria-hidden="true"/>
                                         ) : (
-                                            <Bars3Icon className="block h-6 w-6" aria-hidden="true" />
+                                            <Bars3Icon className="block h-6 w-6" aria-hidden="true"/>
                                         )}
                                     </Disclosure.Button>
                                 </div>
@@ -197,7 +195,7 @@ function HomePage() {
                             <div className="border-t border-gray-700 pb-3 pt-4">
                                 <div className="flex items-center px-5">
                                     <div className="shrink-0">
-                                        <img className="h-10 w-10 rounded-full" src={user.imageUrl} alt="" />
+                                        <img className="h-10 w-10 rounded-full" src={user.imageUrl} alt=""/>
                                     </div>
                                     <div className="ml-3">
                                         <div className="text-base font-medium text-white">{user.name}</div>
@@ -211,7 +209,7 @@ function HomePage() {
                                focus:ring-offset-2 focus:ring-offset-gray-800"
                                     >
                                         <span className="sr-only">View notifications</span>
-                                        <BellIcon className="h-6 w-6" aria-hidden="true" />
+                                        <BellIcon className="h-6 w-6" aria-hidden="true"/>
                                     </button>
                                 </div>
                                 <div className="mt-3 space-y-1 px-2">
@@ -239,10 +237,9 @@ function HomePage() {
 
             <main className="flex-1">
                 <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-                    {currentNav === 'Projekti' && <ProjectsPage />}
-                    {currentNav === 'Kalendar' && <CalendarPage />}
-                    {currentNav === 'Baza proizvoda' && <ProductsPage />}
-                    {currentNav === 'Ponude' && <QuotesPage />}
+                    {currentNav === 'Kalendar' && <CalendarPage/>}
+                    {currentNav === 'Baza proizvoda' && <ProductsPage/>}
+                    {currentNav === 'Ponude' && <QuotesPage/>}
                 </div>
             </main>
         </div>
