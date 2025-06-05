@@ -31,6 +31,18 @@ public class Quote {
     @JoinColumn(name = "project_id", nullable = true)
     private Project project;
 
+    @Lob
+    @Column(columnDefinition = "TEXT", nullable = true)
+    private String description;
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
     public Project getProject() {
         return project;
     }

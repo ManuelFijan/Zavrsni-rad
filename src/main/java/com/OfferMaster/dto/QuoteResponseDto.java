@@ -11,8 +11,9 @@ public class QuoteResponseDto {
     private Integer discount;
     private Long projectId;
     private String projectName;
+    private String description;
 
-    public QuoteResponseDto(Long id, List<QuoteItemDto> items, Instant createdAt, String logoUrl, Integer discount, Long projectId, String projectName) {
+    public QuoteResponseDto(Long id, List<QuoteItemDto> items, Instant createdAt, String logoUrl, Integer discount, Long projectId, String projectName, String description) {
         this.id = id;
         this.items = items;
         this.createdAt = createdAt;
@@ -20,14 +21,19 @@ public class QuoteResponseDto {
         this.discount = discount;
         this.projectId = projectId;
         this.projectName = projectName;
+        this.description = description;
     }
 
     public QuoteResponseDto(Long id, List<QuoteItemDto> items, Instant createdAt, String logoUrl, Integer discount) {
-        this.id = id;
-        this.items = items;
-        this.createdAt = createdAt;
-        this.logoUrl = logoUrl;
-        this.discount = discount;
+        this(id, items, createdAt, logoUrl, discount, null, null, null);
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public Long getProjectId() {

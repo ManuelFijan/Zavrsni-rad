@@ -71,6 +71,7 @@ public class QuoteServiceImpl implements QuoteService {
         Quote q = new Quote();
         q.setUser(user);
         q.setDiscount(dto.getDiscount() != null ? dto.getDiscount() : 0);
+        q.setDescription(dto.getDescription());
 
         if (dto.getLogoBase64() != null && !dto.getLogoBase64().isBlank()) {
             String base64 = dto.getLogoBase64();
@@ -175,6 +176,16 @@ public class QuoteServiceImpl implements QuoteService {
             datePara.setSpacingAfter(8f);
             doc.add(datePara);
 
+            if (q.getDescription() != null && !q.getDescription().isBlank()) {
+                Paragraph descTitle = new Paragraph("Opis ponude:", boldFont);
+                descTitle.setSpacingBefore(5f);
+                doc.add(descTitle);
+                Paragraph descPara = new Paragraph(q.getDescription(), labelFont);
+                descPara.setSpacingAfter(10f);
+                descPara.setIndentationLeft(10f);
+                doc.add(descPara);
+            }
+
             PdfPTable table = new PdfPTable(new float[]{3, 2, 1, 2, 2});
             table.setWidthPercentage(100);
             Stream.of("Naziv", "Količina", "Mjerna jedinica", "Jedinična cijena", "Ukupno")
@@ -269,7 +280,8 @@ public class QuoteServiceImpl implements QuoteService {
                 q.getLogoUrl(),
                 q.getDiscount(),
                 projectId,
-                projectName
+                projectName,
+                q.getDescription()
         );
     }
 
@@ -293,7 +305,8 @@ public class QuoteServiceImpl implements QuoteService {
                             q.getLogoUrl(),
                             q.getDiscount(),
                             projectId,
-                            projectName
+                            projectName,
+                            q.getDescription()
                     );
                 }).collect(Collectors.toList());
     }

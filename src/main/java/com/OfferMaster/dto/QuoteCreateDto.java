@@ -7,6 +7,15 @@ public class QuoteCreateDto {
     private List<QuoteItemRequestDto> items;
     private Integer discount;
     private Long projectId;
+    private String description;
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
     public <T> QuoteCreateDto(Object o, List<T> ts) {
     }
