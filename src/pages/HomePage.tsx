@@ -7,7 +7,6 @@ import ProductsPage from "./ProductsPage";
 import { Link, useNavigate } from 'react-router-dom';
 import QuotesPage from "./QuotesPage";
 import {clearToken, getToken} from "../services/AuthSession";
-import ConversationsPage from "./ConversationPage";
 
 const user = {
     name: 'Ivo Ivić',
@@ -18,7 +17,6 @@ const user = {
 const navigation = [
     { name: 'Ponude', href: '#', current: false },
     { name: 'Projekti', href: '#', current: false },
-    { name: 'Razgovori', href: '#', current: false },
     { name: 'Kalendar', href: '#', current: false },
     { name: 'Baza proizvoda', href: '#', current: false },
 ];
@@ -245,7 +243,6 @@ function HomePage() {
                     {currentNav === 'Kalendar' && <CalendarPage />}
                     {currentNav === 'Baza proizvoda' && <ProductsPage />}
                     {currentNav === 'Ponude' && <QuotesPage />}
-                    {currentNav === 'Razgovori' && <ConversationsPage />}
                 </div>
             </main>
         </div>

@@ -12,6 +12,8 @@ import {
     createFolder,
     Folder,
 } from "../services/FolderService";
+import {EnvelopeIcon} from "@heroicons/react/24/outline";
+import {sendEmail} from "../services/EmailService";
 
 const QuotesPage: React.FC = () => {
     const [products, setProducts] = useState<Product[]>([]);
@@ -30,6 +32,13 @@ const QuotesPage: React.FC = () => {
     const [folderFilter, setFolderFilter] = useState<"all" | "none" | string>("all");
 
     const [discount, setDiscount] = useState<number | "">("");
+
+    const [isEmailModalOpen, setIsEmailModalOpen] = useState(false);
+    const [quoteForEmail, setQuoteForEmail] = useState<Quote | null>(null);
+    const [recipientEmail, setRecipientEmail] = useState("");
+    const [recipientName, setRecipientName] = useState("");
+    const [emailFormErrors, setEmailFormErrors] = useState<{ email?: string }>({});
+    const [isSendingEmail, setIsSendingEmail] = useState(false);
 
     const folderlessQuotes = quotes.filter(
         (q) => !folders.some((f) => f.quoteIds.includes(q.id))
@@ -207,6 +216,45 @@ const QuotesPage: React.FC = () => {
         } catch (err: any) {
             console.error(err);
             alert("Greška pri preuzimanju PDF-a: " + err.message);
+        }
+    };
+
+    const handleOpenEmailModal = (quote: Quote) => {
+        setQuoteForEmail(quote);
+        setRecipientEmail("");
+        setRecipientName("");
+        setEmailFormErrors({});
+        setIsEmailModalOpen(true);
+    };
+
+    const handleCloseEmailModal = () => {
+        setIsEmailModalOpen(false);
+        setQuoteForEmail(null);
+    };
+
+    const validateEmailInputs = () => {
+        const errors: { email?: string } = {};
+        if (!recipientEmail.trim()) {
+            errors.email = "Email je obavezan.";
+        } else if (!/\S+@\S+\.\S+/.test(recipientEmail)) {
+            errors.email = "Unesite ispravan email.";
+        }
+        setEmailFormErrors(errors);
+        return Object.keys(errors).length === 0;
+    };
+
+    const handleSendQuoteEmail = async () => {
+        if (!validateEmailInputs() || !quoteForEmail) return;
+        setIsSendingEmail(true);
+        try {
+            await sendEmail(recipientEmail, recipientName, quoteForEmail.id);
+            alert(`Ponuda #${quoteForEmail.id} uspješno poslana na ${recipientEmail}!`);
+            handleCloseEmailModal();
+        } catch (err: any) {
+            console.error("Greška pri slanju emaila:", err);
+            setEmailFormErrors({email: err.message || "Greška pri slanju emaila."});
+        } finally {
+            setIsSendingEmail(false);
         }
     };
 
@@ -416,6 +464,70 @@ const QuotesPage: React.FC = () => {
                 </div>
             )}
 
+            {isEmailModalOpen && quoteForEmail && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+                    <div className="relative w-full max-w-lg rounded-lg bg-white p-6 shadow-xl space-y-6">
+                        <button
+                            onClick={handleCloseEmailModal}
+                            className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+                        >
+                            <span className="sr-only">Zatvori</span>✕
+                        </button>
+                        <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2">
+                            <EnvelopeIcon className="h-6 w-6 text-orange-500"/>
+                            Slanje ponude #{quoteForEmail.id} emailom
+                        </h2>
+
+                        <div className="space-y-1">
+                            <label htmlFor="recipientEmail" className="block text-sm font-medium text-gray-700">
+                                Email primatelja
+                            </label>
+                            <input
+                                id="recipientEmail"
+                                type="email"
+                                placeholder="Upišite email primatelja"
+                                className={`block w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 ${
+                                    emailFormErrors.email ? "border-red-500" : "border-gray-300"
+                                }`}
+                                value={recipientEmail}
+                                onChange={(e) => setRecipientEmail(e.target.value)}
+                            />
+                            {emailFormErrors.email && <p className="text-sm text-red-500">{emailFormErrors.email}</p>}
+                        </div>
+
+                        <div className="space-y-1">
+                            <label htmlFor="recipientName" className="block text-sm font-medium text-gray-700">
+                                Ime primatelja (opcionalno)
+                            </label>
+                            <input
+                                id="recipientName"
+                                type="text"
+                                placeholder="Unesite ime za personalizaciju emaila"
+                                className="block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                value={recipientName}
+                                onChange={(e) => setRecipientName(e.target.value)}
+                            />
+                        </div>
+
+                        <div className="mt-6 flex justify-end space-x-3">
+                            <button
+                                onClick={handleCloseEmailModal}
+                                className="rounded bg-gray-200 px-4 py-2 text-gray-700 hover:bg-gray-300"
+                            >
+                                Odustani
+                            </button>
+                            <button
+                                onClick={handleSendQuoteEmail}
+                                disabled={isSendingEmail}
+                                className="rounded bg-orange-600 px-4 py-2 text-white hover:bg-orange-700 disabled:opacity-50"
+                            >
+                                {isSendingEmail ? "Slanje..." : "Pošalji Email"}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             <div className="mb-6 flex items-center space-x-4">
                 <label htmlFor="folderFilter" className="text-sm font-medium text-gray-700">
                     Prikaži ponude iz:
@@ -453,26 +565,50 @@ const QuotesPage: React.FC = () => {
                         const discountedTotal = rawTotal * (100 - discountValue) / 100
 
                         return (
-                            <div key={q.id} className="border p-3 rounded mb-2">
-                                <p>ID Ponude: {q.id}</p>
-                                <p>Datum: {new Date(q.createdAt).toLocaleString()}</p>
-                                <p>Bez rabata: {rawTotal.toFixed(2)} €</p>
-                                {discountValue > 0 && <p>Rabat: {discountValue}%</p>}
-                                <p>Rabat: {discountValue}%</p>
-                                <p>Ukupno: {discountedTotal.toFixed(2)} €</p>
-                                <ul className="list-disc pl-5">
-                                    {q.items.map((i) => {
-                                        const prod = products.find((p) => p.id === i.productId);
-                                        return prod ? (
-                                            <li key={i.productId}>
-                                                {prod.name} x {i.quantity} ={" "}
-                                                {(prod.price * i.quantity).toFixed(2)} €
-                                            </li>
-                                        ) : null;
-                                    })}
-                                </ul>
+                            <div key={q.id} className="border p-4 rounded-lg shadow hover:shadow-md mb-3 bg-white">
+                                <div className="flex justify-between items-start">
+                                    <div>
+                                        <h3 className="text-lg font-semibold text-orange-600">Ponuda ID: {q.id}</h3>
+                                        <p
+                                            className="text-xs text-gray-500">Datum: {new Date(q.createdAt).toLocaleString()}</p>
+                                        {q.logoUrl && <img src={q.logoUrl} alt="Logo" className="max-h-12 my-2"/>}
+                                    </div>
+                                    <button
+                                        onClick={() => handleOpenEmailModal(q)}
+                                        className="p-2 text-gray-500 hover:text-orange-600 focus:outline-none"
+                                        title="Pošalji ponudu emailom"
+                                    >
+                                        <EnvelopeIcon className="h-6 w-6"/>
+                                    </button>
+                                </div>
+                                <div className="mt-2">
+                                    <p className="text-sm">Bez rabata: <span
+                                        className="font-medium">{rawTotal.toFixed(2)} €</span></p>
+                                    {discountValue > 0 && (
+                                        <p className="text-sm">Rabat: <span
+                                            className="font-medium">{discountValue}%</span></p>
+                                    )}
+                                    <p className="text-sm font-bold">Ukupno: <span
+                                        className="text-orange-700">{discountedTotal.toFixed(2)} €</span></p>
+                                    <details className="text-xs mt-1 text-gray-600">
+                                        <summary className="cursor-pointer hover:underline">Prikaži stavke</summary>
+                                        <ul className="list-disc pl-5 mt-1">
+                                            {q.items.map((i) => {
+
+                                                const prod = products.find((p) => p.id === i.productId);
+
+                                                return prod ? (
+                                                    <li
+                                                        key={i.productId}>{prod.name} x {i.quantity} = {(prod.price * i.quantity).toFixed(2)} €</li>
+                                                ) : null;
+
+                                            })}
+                                        </ul>
+                                    </details>
+                                </div>
                             </div>
-                        );
+                        )
+                            ;
                     })
                 )}
             </div>
