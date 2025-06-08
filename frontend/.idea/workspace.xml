@@ -4,9 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3694cb8b-40c4-4407-bcc1-59c645812f6b" name="Changes" comment="dodan opis u ponudu i filtriranje/sortiranje ponuda">
-      <change afterPath="$PROJECT_DIR$/../backend/Dockerfile" afterDir="false" />
-    </list>
+    <list default="true" id="3694cb8b-40c4-4407-bcc1-59c645812f6b" name="Changes" comment="dodavanj urla" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -22,6 +20,11 @@
     </option>
   </component>
   <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$/.." value="main" />
+      </map>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
     <option name="RESET_MODE" value="HARD" />
   </component>
@@ -155,7 +158,7 @@
       <workItem from="1749104767938" duration="13940000" />
       <workItem from="1749198281238" duration="4372000" />
       <workItem from="1749365744414" duration="3477000" />
-      <workItem from="1749409815284" duration="1113000" />
+      <workItem from="1749409815284" duration="1733000" />
     </task>
     <task id="LOCAL-00001" summary="inicijalni commit">
       <option name="closed" value="true" />
@@ -357,7 +360,15 @@
       <option name="project" value="LOCAL" />
       <updated>1749160205603</updated>
     </task>
-    <option name="localTasksCounter" value="26" />
+    <task id="LOCAL-00026" summary="dodavanj urla">
+      <option name="closed" value="true" />
+      <created>1749411549432</created>
+      <option name="number" value="00026" />
+      <option name="presentableId" value="LOCAL-00026" />
+      <option name="project" value="LOCAL" />
+      <updated>1749411549433</updated>
+    </task>
+    <option name="localTasksCounter" value="27" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -375,7 +386,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="inicijalni commit" />
     <MESSAGE value="Dodana &quot;o nama&quot; stranica. Logo, footer i back button pretvoreni u komponente" />
     <MESSAGE value="ispravak greške" />
     <MESSAGE value="napravljene glavne komponente" />
@@ -400,6 +410,7 @@
     <MESSAGE value="rad na kalendaru" />
     <MESSAGE value="omogućeno svrstavanje ponuda u projekte umjesto foldere" />
     <MESSAGE value="dodan opis u ponudu i filtriranje/sortiranje ponuda" />
-    <option name="LAST_COMMIT_MESSAGE" value="dodan opis u ponudu i filtriranje/sortiranje ponuda" />
+    <MESSAGE value="dodavanj urla" />
+    <option name="LAST_COMMIT_MESSAGE" value="dodavanj urla" />
   </component>
 </project>
