@@ -1,0 +1,409 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="3694cb8b-40c4-4407-bcc1-59c645812f6b" name="Changes" comment="dodan opis u ponudu i filtriranje/sortiranje ponuda">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/HomePage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/HomePage.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/ProfilePage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/ProfilePage.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/QuotesPage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/QuotesPage.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/services/EmailService.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/services/EmailService.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/services/axiosConfig.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/services/axiosConfig.ts" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="JavaScript File" />
+        <option value="TypeScript File" />
+        <option value="TypeScript JSX File" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="RESET_MODE" value="HARD" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;ManuelFijan&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/ManuelFijan/Zavrsni-rad.git&quot;,
+    &quot;accountId&quot;: &quot;72167677-edba-467b-af07-04b38a77ca41&quot;
+  }
+}</component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 1
+}</component>
+  <component name="ProjectId" id="2noN3zaaoonj2ZMTQcropL8v3c8" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;frontend&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/Manuel/WebstormProjects/Projekt-R/public/images&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;npm.npm start.executor&quot;: &quot;Run&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;org.jetbrains.plugins.github.ui.GithubSettingsConfigurable&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;C:\\Users\\Manuel\\WebstormProjects\\Zavrsni-rad-frontend\\node_modules\\typescript\\lib&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  }
+}</component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\Manuel\WebstormProjects\Projekt-R\public\images" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\Manuel\WebstormProjects\Projekt-R\src\components" />
+    </key>
+  </component>
+  <component name="RunManager">
+    <configuration name="npm start" type="js.build_tools.npm">
+      <package-json value="$PROJECT_DIR$/package.json" />
+      <command value="run" />
+      <scripts>
+        <script value="start" />
+      </scripts>
+      <node-interpreter value="project" />
+      <envs />
+      <method v="2" />
+    </configuration>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-js-predefined-d6986cc7102b-5c90d61e3bab-JavaScript-WS-242.23339.15" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="3694cb8b-40c4-4407-bcc1-59c645812f6b" name="Changes" comment="" />
+      <created>1729635275115</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1729635275115</updated>
+      <workItem from="1729635277248" duration="467000" />
+      <workItem from="1729635757176" duration="430000" />
+      <workItem from="1729675407258" duration="879000" />
+      <workItem from="1729797140834" duration="42000" />
+      <workItem from="1729886106765" duration="2280000" />
+      <workItem from="1730125549800" duration="3261000" />
+      <workItem from="1730227542982" duration="7681000" />
+      <workItem from="1730929992670" duration="4191000" />
+      <workItem from="1730967981380" duration="1104000" />
+      <workItem from="1730984374307" duration="38000" />
+      <workItem from="1730984752251" duration="83000" />
+      <workItem from="1731502198780" duration="1222000" />
+      <workItem from="1735493482150" duration="2000" />
+      <workItem from="1736165431969" duration="680000" />
+      <workItem from="1736183823663" duration="11232000" />
+      <workItem from="1736278864625" duration="7712000" />
+      <workItem from="1736854229542" duration="20647000" />
+      <workItem from="1736941963821" duration="10868000" />
+      <workItem from="1737032972863" duration="2679000" />
+      <workItem from="1737043693143" duration="892000" />
+      <workItem from="1737106247299" duration="727000" />
+      <workItem from="1737123573996" duration="1588000" />
+      <workItem from="1737974855224" duration="2830000" />
+      <workItem from="1737983231627" duration="1137000" />
+      <workItem from="1737987239065" duration="9432000" />
+      <workItem from="1741913395245" duration="805000" />
+      <workItem from="1742949007932" duration="1043000" />
+      <workItem from="1743020072877" duration="430000" />
+      <workItem from="1743397612630" duration="3000" />
+      <workItem from="1743602098785" duration="2000" />
+      <workItem from="1744056015049" duration="596000" />
+      <workItem from="1744722662641" duration="2214000" />
+      <workItem from="1744748816728" duration="842000" />
+      <workItem from="1744790601817" duration="8413000" />
+      <workItem from="1744847131039" duration="593000" />
+      <workItem from="1744868560154" duration="8608000" />
+      <workItem from="1744907003350" duration="25000" />
+      <workItem from="1747041752909" duration="7971000" />
+      <workItem from="1747134732211" duration="15965000" />
+      <workItem from="1747211259581" duration="2388000" />
+      <workItem from="1747404467141" duration="1761000" />
+      <workItem from="1747583555542" duration="585000" />
+      <workItem from="1747749178038" duration="4406000" />
+      <workItem from="1747816815162" duration="6638000" />
+      <workItem from="1747935087772" duration="10033000" />
+      <workItem from="1747987679345" duration="780000" />
+      <workItem from="1748254846255" duration="48000" />
+      <workItem from="1748844383520" duration="3769000" />
+      <workItem from="1748857096113" duration="2125000" />
+      <workItem from="1749104767938" duration="13940000" />
+      <workItem from="1749198281238" duration="4372000" />
+      <workItem from="1749365744414" duration="3477000" />
+    </task>
+    <task id="LOCAL-00001" summary="inicijalni commit">
+      <option name="closed" value="true" />
+      <created>1729635983312</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1729635983312</updated>
+    </task>
+    <task id="LOCAL-00002" summary="Dodana &quot;o nama&quot; stranica. Logo, footer i back button pretvoreni u komponente">
+      <option name="closed" value="true" />
+      <created>1730236279076</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1730236279076</updated>
+    </task>
+    <task id="LOCAL-00003" summary="ispravak greške">
+      <option name="closed" value="true" />
+      <created>1730968350527</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1730968350527</updated>
+    </task>
+    <task id="LOCAL-00004" summary="napravljene glavne komponente">
+      <option name="closed" value="true" />
+      <created>1736292537213</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1736292537213</updated>
+    </task>
+    <task id="LOCAL-00005" summary="Napravljene sve (mock)funkcionalnosti: pravljenje ponuda, kalendar, razgovori, pregled gradilišta, baza proizvoda. Omogućene sesije.">
+      <option name="closed" value="true" />
+      <created>1736983291373</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1736983291373</updated>
+    </task>
+    <task id="LOCAL-00006" summary="Dodan frontend dio aplikacije">
+      <option name="closed" value="true" />
+      <created>1744750411406</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1744750411406</updated>
+    </task>
+    <task id="LOCAL-00007" summary="povezivanje login i register funkcija">
+      <option name="closed" value="true" />
+      <created>1744870766730</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1744870766730</updated>
+    </task>
+    <task id="LOCAL-00008" summary="povezivanje funkcije ažuriranja profila">
+      <option name="closed" value="true" />
+      <created>1744871565949</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1744871565949</updated>
+    </task>
+    <task id="LOCAL-00009" summary="povezivanje funkcija dodavanja, uređivanja i pretraživanja artikala u bazi">
+      <option name="closed" value="true" />
+      <created>1744876162888</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1744876162888</updated>
+    </task>
+    <task id="LOCAL-00010" summary="provjera da se mail već ne koristi prilikom registracije">
+      <option name="closed" value="true" />
+      <created>1747063782007</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1747063782007</updated>
+    </task>
+    <task id="LOCAL-00011" summary="ispravci/poboljšanje dodavanja i uređivanja arikala u bazi">
+      <option name="closed" value="true" />
+      <created>1747083670998</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1747083670998</updated>
+    </task>
+    <task id="LOCAL-00012" summary="dodavanje poruke kod ažuriranja profila">
+      <option name="closed" value="true" />
+      <created>1747084968554</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1747084968554</updated>
+    </task>
+    <task id="LOCAL-00013" summary="poboljšanje pretrage i dohvaćanja proizvoda iz baze">
+      <option name="closed" value="true" />
+      <created>1747158562526</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1747158562526</updated>
+    </task>
+    <task id="LOCAL-00014" summary="izrada funkcionalnosti stvaranja i spremanja ponuda u bazu">
+      <option name="closed" value="true" />
+      <created>1747172997630</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1747172997630</updated>
+    </task>
+    <task id="LOCAL-00015" summary="izrada funkcionalnosti slanja ponuda na email i redizajn prozora za slanje maila">
+      <option name="closed" value="true" />
+      <created>1747177271896</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1747177271896</updated>
+    </task>
+    <task id="LOCAL-00016" summary="omogućeno resetiranje lozinke">
+      <option name="closed" value="true" />
+      <created>1747817224815</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1747817224815</updated>
+    </task>
+    <task id="LOCAL-00017" summary="dodane poruke prilikom korištenja krivih podataka za login i provjera duljine lozinke kod registracije">
+      <option name="closed" value="true" />
+      <created>1747819043913</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1747819043913</updated>
+    </task>
+    <task id="LOCAL-00018" summary="dodane poruke za errore prilikom promjene lozinke">
+      <option name="closed" value="true" />
+      <created>1747825334630</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1747825334630</updated>
+    </task>
+    <task id="LOCAL-00019" summary="omogućeno dodavanje mjerne jedinice za proizvode">
+      <option name="closed" value="true" />
+      <created>1747938944950</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1747938944950</updated>
+    </task>
+    <task id="LOCAL-00020" summary="omogućeno dodavanje rabata u ponude">
+      <option name="closed" value="true" />
+      <created>1747947020422</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1747947020422</updated>
+    </task>
+    <task id="LOCAL-00021" summary="formatiranje ponuda">
+      <option name="closed" value="true" />
+      <created>1747952305988</created>
+      <option name="number" value="00021" />
+      <option name="presentableId" value="LOCAL-00021" />
+      <option name="project" value="LOCAL" />
+      <updated>1747952305988</updated>
+    </task>
+    <task id="LOCAL-00022" summary="slanje emaila prebačenu u ikonicu kraj svake ponude, porađeno na prikazu ponuda">
+      <option name="closed" value="true" />
+      <created>1749131282280</created>
+      <option name="number" value="00022" />
+      <option name="presentableId" value="LOCAL-00022" />
+      <option name="project" value="LOCAL" />
+      <updated>1749131282280</updated>
+    </task>
+    <task id="LOCAL-00023" summary="rad na kalendaru">
+      <option name="closed" value="true" />
+      <created>1749134469432</created>
+      <option name="number" value="00023" />
+      <option name="presentableId" value="LOCAL-00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1749134469432</updated>
+    </task>
+    <task id="LOCAL-00024" summary="omogućeno svrstavanje ponuda u projekte umjesto foldere">
+      <option name="closed" value="true" />
+      <created>1749143091375</created>
+      <option name="number" value="00024" />
+      <option name="presentableId" value="LOCAL-00024" />
+      <option name="project" value="LOCAL" />
+      <updated>1749143091375</updated>
+    </task>
+    <task id="LOCAL-00025" summary="dodan opis u ponudu i filtriranje/sortiranje ponuda">
+      <option name="closed" value="true" />
+      <created>1749160205603</created>
+      <option name="number" value="00025" />
+      <option name="presentableId" value="LOCAL-00025" />
+      <option name="project" value="LOCAL" />
+      <updated>1749160205603</updated>
+    </task>
+    <option name="localTasksCounter" value="26" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="inicijalni commit" />
+    <MESSAGE value="Dodana &quot;o nama&quot; stranica. Logo, footer i back button pretvoreni u komponente" />
+    <MESSAGE value="ispravak greške" />
+    <MESSAGE value="napravljene glavne komponente" />
+    <MESSAGE value="Napravljene sve (mock)funkcionalnosti: pravljenje ponuda, kalendar, razgovori, pregled gradilišta, baza proizvoda. Omogućene sesije." />
+    <MESSAGE value="Dodan frontend dio aplikacije" />
+    <MESSAGE value="povezivanje login i register funkcija" />
+    <MESSAGE value="povezivanje funkcije ažuriranja profila" />
+    <MESSAGE value="povezivanje funkcija dodavanja, uređivanja i pretraživanja artikala u bazi" />
+    <MESSAGE value="provjera da se mail već ne koristi prilikom registracije" />
+    <MESSAGE value="ispravci/poboljšanje dodavanja i uređivanja arikala u bazi" />
+    <MESSAGE value="dodavanje poruke kod ažuriranja profila" />
+    <MESSAGE value="poboljšanje pretrage i dohvaćanja proizvoda iz baze" />
+    <MESSAGE value="izrada funkcionalnosti stvaranja i spremanja ponuda u bazu" />
+    <MESSAGE value="izrada funkcionalnosti slanja ponuda na email i redizajn prozora za slanje maila" />
+    <MESSAGE value="omogućeno resetiranje lozinke" />
+    <MESSAGE value="dodane poruke prilikom korištenja krivih podataka za login i provjera duljine lozinke kod registracije" />
+    <MESSAGE value="dodane poruke za errore prilikom promjene lozinke" />
+    <MESSAGE value="omogućeno dodavanje mjerne jedinice za proizvode" />
+    <MESSAGE value="omogućeno dodavanje rabata u ponude" />
+    <MESSAGE value="formatiranje ponuda" />
+    <MESSAGE value="slanje emaila prebačenu u ikonicu kraj svake ponude, porađeno na prikazu ponuda" />
+    <MESSAGE value="rad na kalendaru" />
+    <MESSAGE value="omogućeno svrstavanje ponuda u projekte umjesto foldere" />
+    <MESSAGE value="dodan opis u ponudu i filtriranje/sortiranje ponuda" />
+    <option name="LAST_COMMIT_MESSAGE" value="dodan opis u ponudu i filtriranje/sortiranje ponuda" />
+  </component>
+</project>
