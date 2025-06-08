@@ -1,5 +1,5 @@
 import axios from "axios";
-import { getToken } from "./AuthSession";
+import {clearToken, getToken} from "./AuthSession";
 
 const apiClient = axios.create({
     baseURL: "http://localhost:8080",

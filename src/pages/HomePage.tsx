@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {Disclosure, Menu, MenuButton, MenuItem, MenuItems} from '@headlessui/react';
-import {Bars3Icon, BellIcon, XMarkIcon} from '@heroicons/react/24/outline';
+import {Bars3Icon, BellIcon, XMarkIcon, UserCircleIcon} from '@heroicons/react/24/outline';
 import CalendarPage from '../components/Calendar';
 import ProductsPage from "./ProductsPage";
 import {Link, useNavigate} from 'react-router-dom';
@@ -101,11 +101,7 @@ function HomePage() {
                                      focus:ring-offset-2 focus:ring-offset-gray-800"
                                                 >
                                                     <span className="sr-only">Open user menu</span>
-                                                    <img
-                                                        className="h-8 w-8 rounded-full"
-                                                        src={user.imageUrl}
-                                                        alt=""
-                                                    />
+                                                    <UserCircleIcon className="h-8 w-8 text-gray-400 hover:text-white"/>
                                                 </MenuButton>
                                             </div>
                                             <MenuItems
@@ -195,39 +191,35 @@ function HomePage() {
                             <div className="border-t border-gray-700 pb-3 pt-4">
                                 <div className="flex items-center px-5">
                                     <div className="shrink-0">
-                                        <img className="h-10 w-10 rounded-full" src={user.imageUrl} alt=""/>
+                                        <UserCircleIcon className="h-10 w-10 text-gray-400"/>
                                     </div>
-                                    <div className="ml-3">
-                                        <div className="text-base font-medium text-white">{user.name}</div>
-                                        <div className="text-sm font-medium text-gray-400">{user.email}</div>
-                                    </div>
-                                    <button
-                                        type="button"
-                                        className="ml-auto flex-shrink-0 rounded-full
-                               bg-gray-800 p-1 text-gray-400 hover:text-white
-                               focus:outline-none focus:ring-2 focus:ring-white
-                               focus:ring-offset-2 focus:ring-offset-gray-800"
-                                    >
-                                        <span className="sr-only">View notifications</span>
-                                        <BellIcon className="h-6 w-6" aria-hidden="true"/>
-                                    </button>
+
                                 </div>
                                 <div className="mt-3 space-y-1 px-2">
-                                    {userNavigation.map((item) => (
-                                        <Disclosure.Button
-                                            key={item.name}
-                                            as={Link}
-                                            to={item.href}
-                                            onClick={(e) => {
-                                                e.preventDefault();
-                                                handleNavClick(item.name);
-                                            }}
-                                            className="block rounded-md px-3 py-2 text-base font-medium
-                                 text-gray-400 hover:bg-gray-700 hover:text-white"
-                                        >
-                                            {item.name}
-                                        </Disclosure.Button>
-                                    ))}
+                                    {userNavigation.map((item) => {
+                                        if (item.name === "Odjava") {
+                                            return (
+                                                <Disclosure.Button
+                                                    key={item.name}
+                                                    as="button"
+                                                    onClick={handleSignOut}
+                                                    className="block w-full text-left rounded-md px-3 py-2 text-base font-medium text-gray-400 hover:bg-gray-700 hover:text-white"
+                                                >
+                                                    {item.name}
+                                                </Disclosure.Button>
+                                            );
+                                        }
+                                        return (
+                                            <Disclosure.Button
+                                                key={item.name}
+                                                as={Link}
+                                                to={item.href}
+                                                className="block rounded-md px-3 py-2 text-base font-medium text-gray-400 hover:bg-gray-700 hover:text-white"
+                                            >
+                                                {item.name}
+                                            </Disclosure.Button>
+                                        );
+                                    })}
                                 </div>
                             </div>
                         </Disclosure.Panel>
