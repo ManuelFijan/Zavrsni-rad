@@ -84,12 +84,13 @@
 
     <!-- Body -->
     <div class="content">
-        <p>Pozdrav <strong th:text="${recipientName}">Korisniče</strong>,</p>
-        <p>Hvala što ste nas izabrali. U prilogu se nalazi PDF ponuda koju ste zatražili.</p>
-        <p>Možete je preuzeti i klikom na gumb ispod:</p>
-        <p style="text-align:center;">
-            <a th:href="@{${downloadUrl}}" class="btn">Preuzmi svoju ponudu</a>
+        <p th:if="${hasRecipientName}">
+            Pozdrav <span th:text="${recipientName}"></span>,
         </p>
+        <p th:unless="${hasRecipientName}">
+            Pozdrav,
+        </p>
+        <p>Hvala što ste nas izabrali. U prilogu se nalazi PDF ponuda koju ste zatražili.</p>
         <p>Radujemo se vašem javljanju i nadamo se uspješnoj suradnji!</p>
     </div>
 

@@ -11,6 +11,7 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring6.SpringTemplateEngine;
+
 import java.nio.charset.StandardCharsets;
 
 @Service
@@ -31,8 +32,9 @@ public class EmailServiceImpl implements EmailService {
     @Override
     public void sendQuoteEmail(String to, String recipientName, Long quoteId) {
         Context ctx = new Context();
-        ctx.setVariable("recipientName",
-                (recipientName != null && !recipientName.isBlank()) ? recipientName : "Korisniče");
+        boolean hasRecipientName = recipientName != null && !recipientName.isBlank();
+        ctx.setVariable("hasRecipientName", hasRecipientName);
+        ctx.setVariable("recipientName", recipientName);
         ctx.setVariable("downloadUrl", "https://your.domain.com/api/quotes/" + quoteId + "/pdf");
         String html = templateEngine.process("quote-email", ctx);
 
