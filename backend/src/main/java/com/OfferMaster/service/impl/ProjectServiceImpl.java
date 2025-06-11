@@ -3,6 +3,7 @@ package com.OfferMaster.service.impl;
 import com.OfferMaster.dto.ProjectCreateDto;
 import com.OfferMaster.dto.ProjectDto;
 import com.OfferMaster.dto.ProjectUpdateDto;
+import com.OfferMaster.mapper.ProjectMapper;
 import com.OfferMaster.model.Project;
 import com.OfferMaster.model.User;
 import com.OfferMaster.repository.ProjectRepository;
@@ -12,6 +13,7 @@ import com.OfferMaster.service.ProjectService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -36,17 +38,18 @@ public class ProjectServiceImpl implements ProjectService {
     private final UserRepository userRepository;
     private final QuoteRepository quoteRepository;
     private final WebClient supabaseClient;
-
+    private final ProjectMapper projectMapper;
 
     @Autowired
     public ProjectServiceImpl(ProjectRepository projectRepository,
                               UserRepository userRepository,
                               QuoteRepository quoteRepository,
-                              WebClient supabaseClient) {
+                              WebClient supabaseClient, ProjectMapper projectMapper) {
         this.projectRepository = projectRepository;
         this.userRepository = userRepository;
         this.quoteRepository = quoteRepository;
         this.supabaseClient = supabaseClient;
+        this.projectMapper = projectMapper;
     }
 
     private User getCurrentUser() {
@@ -76,7 +79,7 @@ public class ProjectServiceImpl implements ProjectService {
                 .bodyValue(imageBytes)
                 .retrieve()
                 .onStatus(
-                        httpStatusCode -> httpStatusCode.isError(),
+                        HttpStatusCode::isError,
                         clientResponse -> clientResponse.bodyToMono(String.class)
                                 .flatMap(errorBody -> Mono.error(new RuntimeException("Supabase upload failed for project image: " + errorBody)))
                 )
@@ -104,7 +107,7 @@ public class ProjectServiceImpl implements ProjectService {
         }
 
         Project savedProject = projectRepository.save(project);
-        return mapToDto(savedProject);
+        return projectMapper.toDto(savedProject);
     }
 
     @Override
@@ -116,7 +119,7 @@ public class ProjectServiceImpl implements ProjectService {
         if (!project.getUser().getUserId().equals(currentUser.getUserId())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Pristup odbijen");
         }
-        return mapToDto(project);
+        return projectMapper.toDto(project);
     }
 
     @Override
@@ -124,7 +127,7 @@ public class ProjectServiceImpl implements ProjectService {
     public List<ProjectDto> getAllUserProjects() {
         User currentUser = getCurrentUser();
         return projectRepository.findByUserOrderByNameAsc(currentUser).stream()
-                .map(this::mapToDto)
+                .map(projectMapper::toDto)
                 .collect(Collectors.toList());
     }
 
@@ -153,7 +156,7 @@ public class ProjectServiceImpl implements ProjectService {
 
 
         Project updatedProject = projectRepository.save(project);
-        return mapToDto(updatedProject);
+        return projectMapper.toDto(updatedProject);
     }
 
     @Override
@@ -174,18 +177,5 @@ public class ProjectServiceImpl implements ProjectService {
         project.getQuotes().clear();
 
         projectRepository.delete(project);
-    }
-
-    private ProjectDto mapToDto(Project project) {
-        return new ProjectDto(
-                project.getId(),
-                project.getName(),
-                project.getAddress(),
-                project.getStatus(),
-                project.getImageUrl(),
-                project.getNotes(),
-                project.getCreatedAt(),
-                project.getUpdatedAt()
-        );
     }
 }

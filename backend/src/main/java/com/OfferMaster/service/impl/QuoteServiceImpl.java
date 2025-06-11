@@ -1,6 +1,7 @@
 package com.OfferMaster.service.impl;
 
 import com.OfferMaster.dto.*;
+import com.OfferMaster.mapper.QuoteMapper;
 import com.OfferMaster.model.*;
 import com.OfferMaster.repository.*;
 import com.OfferMaster.service.QuoteService;
@@ -41,18 +42,20 @@ public class QuoteServiceImpl implements QuoteService {
     private final WebClient supabaseClient;
     private final UserRepository userRepository;
     private final ProjectRepository projectRepository;
+    private final QuoteMapper quoteMapper;
 
     @Autowired
     public QuoteServiceImpl(
             QuoteRepository quoteRepo,
             ArticleRepository articleRepo,
-            WebClient supabaseClient, UserRepository userRepository, ProjectRepository projectRepository
+            WebClient supabaseClient, UserRepository userRepository, ProjectRepository projectRepository, QuoteMapper quoteMapper
     ) {
         this.quoteRepo = quoteRepo;
         this.articleRepo = articleRepo;
         this.supabaseClient = supabaseClient;
         this.userRepository = userRepository;
         this.projectRepository = projectRepository;
+        this.quoteMapper = quoteMapper;
     }
 
     @Override
@@ -268,21 +271,7 @@ public class QuoteServiceImpl implements QuoteService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Quote not found");
         }
 
-        Long projectId = (q.getProject() != null) ? q.getProject().getId() : null;
-        String projectName = (q.getProject() != null) ? q.getProject().getName() : null;
-
-        return new QuoteResponseDto(
-                q.getId(),
-                q.getItems().stream()
-                        .map(it -> new QuoteItemDto(it.getArticle().getArticleId(), it.getQuantity()))
-                        .collect(Collectors.toList()),
-                q.getCreatedAt(),
-                q.getLogoUrl(),
-                q.getDiscount(),
-                projectId,
-                projectName,
-                q.getDescription()
-        );
+        return quoteMapper.toDto(q);
     }
 
     @Override
@@ -291,23 +280,7 @@ public class QuoteServiceImpl implements QuoteService {
         User user = currentUser();
 
         return quoteRepo.findByUser(user).stream()
-                .map(q -> {
-                    Long projectId = (q.getProject() != null) ? q.getProject().getId() : null;
-                    String projectName = (q.getProject() != null) ? q.getProject().getName() : null;
-                    return new QuoteResponseDto(
-                            q.getId(),
-                            q.getItems().stream()
-                                    .map(it -> new QuoteItemDto(
-                                            it.getArticle().getArticleId(),
-                                            it.getQuantity()))
-                                    .collect(Collectors.toList()),
-                            q.getCreatedAt(),
-                            q.getLogoUrl(),
-                            q.getDiscount(),
-                            projectId,
-                            projectName,
-                            q.getDescription()
-                    );
-                }).collect(Collectors.toList());
+                .map(quoteMapper::toDto)
+                .collect(Collectors.toList());
     }
 }

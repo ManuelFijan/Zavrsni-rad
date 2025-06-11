@@ -13,6 +13,9 @@ public class QuoteResponseDto {
     private String projectName;
     private String description;
 
+    public QuoteResponseDto() {
+    }
+
     public QuoteResponseDto(Long id, List<QuoteItemDto> items, Instant createdAt, String logoUrl, Integer discount, Long projectId, String projectName, String description) {
         this.id = id;
         this.items = items;

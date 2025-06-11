@@ -2,6 +2,7 @@ package com.OfferMaster.service.impl;
 
 import com.OfferMaster.dto.CalendarEventCreateDto;
 import com.OfferMaster.dto.CalendarEventDto;
+import com.OfferMaster.mapper.CalendarEventMapper;
 import com.OfferMaster.model.CalendarEvent;
 import com.OfferMaster.model.Quote;
 import com.OfferMaster.model.User;
@@ -26,14 +27,16 @@ public class CalendarServiceImpl implements CalendarService {
     private final CalendarEventRepository calendarEventRepository;
     private final UserRepository userRepository;
     private final QuoteRepository quoteRepository;
+    private final CalendarEventMapper calendarEventMapper;
 
     @Autowired
     public CalendarServiceImpl(CalendarEventRepository calendarEventRepository,
                                UserRepository userRepository,
-                               QuoteRepository quoteRepository) {
+                               QuoteRepository quoteRepository, CalendarEventMapper calendarEventMapper) {
         this.calendarEventRepository = calendarEventRepository;
         this.userRepository = userRepository;
         this.quoteRepository = quoteRepository;
+        this.calendarEventMapper = calendarEventMapper;
     }
 
     private User getCurrentUser() {
@@ -65,7 +68,7 @@ public class CalendarServiceImpl implements CalendarService {
         }
 
         CalendarEvent savedEvent = calendarEventRepository.save(event);
-        return mapToDto(savedEvent);
+        return calendarEventMapper.toDto(savedEvent);
     }
 
     @Override
@@ -73,7 +76,7 @@ public class CalendarServiceImpl implements CalendarService {
     public List<CalendarEventDto> getUserEvents() {
         User currentUser = getCurrentUser();
         return calendarEventRepository.findByUserOrderByEventDateAsc(currentUser).stream()
-                .map(this::mapToDto)
+                .map(calendarEventMapper::toDto)
                 .collect(Collectors.toList());
     }
 
@@ -88,16 +91,5 @@ public class CalendarServiceImpl implements CalendarService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User cannot delete this event");
         }
         calendarEventRepository.delete(event);
-    }
-
-    private CalendarEventDto mapToDto(CalendarEvent event) {
-        CalendarEventDto dto = new CalendarEventDto();
-        dto.setId(event.getId());
-        dto.setTitle(event.getTitle());
-        dto.setDate(event.getEventDate());
-        if (event.getQuote() != null) {
-            dto.setQuoteId(event.getQuote().getId());
-        }
-        return dto;
     }
 }

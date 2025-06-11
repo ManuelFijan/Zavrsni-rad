@@ -2,6 +2,7 @@ package com.OfferMaster.service.impl;
 
 import com.OfferMaster.dto.ArticleDto;
 import com.OfferMaster.dto.ArticleRequestDto;
+import com.OfferMaster.mapper.ArticleMapper;
 import com.OfferMaster.model.Article;
 import com.OfferMaster.repository.ArticleRepository;
 import com.OfferMaster.service.ArticleService;
@@ -12,15 +13,18 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+
 import java.util.List;
 
 @Service
 public class ArticleServiceImpl implements ArticleService {
 
     private final ArticleRepository articleRepository;
+    private final ArticleMapper articleMapper;
 
-    public ArticleServiceImpl(ArticleRepository articleRepository) {
+    public ArticleServiceImpl(ArticleRepository articleRepository, ArticleMapper articleMapper) {
         this.articleRepository = articleRepository;
+        this.articleMapper = articleMapper;
     }
 
     @Override
@@ -30,7 +34,7 @@ public class ArticleServiceImpl implements ArticleService {
                 ? articleRepository.findByNameContainingIgnoreCase(name, pageRequest)
                 : articleRepository.findAll(pageRequest);
 
-        return articlePage.map(this::convertToDto);
+        return articlePage.map(articleMapper::toDto);
     }
 
     @Override
@@ -51,7 +55,7 @@ public class ArticleServiceImpl implements ArticleService {
 
         Article savedArticle = articleRepository.save(article);
 
-        return convertToDto(savedArticle);
+        return articleMapper.toDto(savedArticle);
     }
 
     @Override
@@ -76,17 +80,6 @@ public class ArticleServiceImpl implements ArticleService {
         article.setMeasureUnit(articleRequestDto.getMeasureUnit());
 
         Article updatedArticle = articleRepository.save(article);
-        return convertToDto(updatedArticle);
-    }
-
-    public ArticleDto convertToDto(Article article) {
-        ArticleDto dto = new ArticleDto();
-        dto.setArticleId(article.getArticleId());
-        dto.setName(article.getName());
-        dto.setDescription(article.getDescription());
-        dto.setCategory(article.getCategory());
-        dto.setPrice(article.getPrice());
-        dto.setMeasureUnit(article.getMeasureUnit());
-        return dto;
+        return articleMapper.toDto(updatedArticle);
     }
 }
