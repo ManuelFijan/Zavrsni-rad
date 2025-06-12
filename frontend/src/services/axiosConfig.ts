@@ -3,7 +3,7 @@ import {clearToken, getToken} from "./AuthSession";
 
 const apiClient = axios.create({
     baseURL: process.env.REACT_APP_API_URL || "http://localhost:8080",
-    headers: { "Content-Type": "application/json" },
+    headers: {"Content-Type": "application/json"},
 });
 
 apiClient.interceptors.request.use((config) => {

@@ -4,7 +4,27 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3694cb8b-40c4-4407-bcc1-59c645812f6b" name="Changes" comment="dodavanj urla" />
+    <list default="true" id="3694cb8b-40c4-4407-bcc1-59c645812f6b" name="Changes" comment="dodavanj urla">
+      <change afterPath="$PROJECT_DIR$/e2e/auth.spec.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/e2e/calendar.spec.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/e2e/helpers/test-helpers.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/e2e/pages/index.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/e2e/products.spec.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/e2e/profile.spec.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/e2e/quote.spec.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/playwright.config.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/ConversationPage.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/HomePage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/HomePage.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/services/AuthContext.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/services/AuthContext.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/services/AuthService.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/services/AuthService.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/services/FolderService.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/services/axiosConfig.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/services/axiosConfig.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/setupTests.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/setupTests.ts" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -14,8 +34,8 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="JavaScript File" />
-        <option value="TypeScript File" />
         <option value="TypeScript JSX File" />
+        <option value="TypeScript File" />
       </list>
     </option>
   </component>
@@ -47,7 +67,7 @@
   &quot;associatedIndex&quot;: 1
 }</component>
   <component name="ProjectId" id="2noN3zaaoonj2ZMTQcropL8v3c8" />
-  <component name="ProjectLevelVcsManager">
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
     <ConfirmationsSetting value="2" id="Add" />
   </component>
   <component name="ProjectViewState">
@@ -56,6 +76,8 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "Playwright.Quote Management.executor": "Run",
+    "Playwright.Quote Management.should search for products in quote modal.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "git-widget-placeholder": "main",
     "ignore.virus.scanning.warn.message": "true",
@@ -66,7 +88,7 @@
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
     "npm.npm start.executor": "Run",
-    "settings.editor.selected.configurable": "org.jetbrains.plugins.github.ui.GithubSettingsConfigurable",
+    "settings.editor.selected.configurable": "project.propVCSSupport.DirectoryMappings",
     "ts.external.directory.path": "C:\\Users\\Manuel\\IdeaProjects\\Zavrsni-rad\\frontend\\node_modules\\typescript\\lib",
     "vue.rearranger.settings.migration": "true"
   }
@@ -76,10 +98,39 @@
       <recent name="C:\Users\Manuel\WebstormProjects\Projekt-R\public\images" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
-      <recent name="C:\Users\Manuel\WebstormProjects\Projekt-R\src\components" />
+      <recent name="C:\Users\Manuel\IdeaProjects\Zavrsni-rad\frontend" />
+      <recent name="C:\Users\Manuel\IdeaProjects\Zavrsni-rad\frontend\tests" />
+      <recent name="C:\Users\Manuel\IdeaProjects\Zavrsni-rad\frontend\tests\e2e" />
+      <recent name="C:\Users\Manuel\IdeaProjects\Zavrsni-rad\frontend\tests\e2e\helpers" />
+      <recent name="C:\Users\Manuel\IdeaProjects\Zavrsni-rad\frontend\e2e" />
     </key>
   </component>
-  <component name="RunManager">
+  <component name="RunManager" selected="npm.npm start">
+    <configuration name="Quote Management" type="JavaScriptTestRunnerPlaywright" temporary="true" nameIsGenerated="true">
+      <node-interpreter value="project" />
+      <playwright-package value="$PROJECT_DIR$/node_modules/@playwright/test" />
+      <working-dir value="$PROJECT_DIR$" />
+      <envs />
+      <scope-kind value="SUITE" />
+      <test-file value="$PROJECT_DIR$/e2e/tests/quotes.spec.ts" />
+      <test-names>
+        <test-name value="Quote Management" />
+      </test-names>
+      <method v="2" />
+    </configuration>
+    <configuration name="Quote Management.should search for products in quote modal" type="JavaScriptTestRunnerPlaywright" temporary="true" nameIsGenerated="true">
+      <node-interpreter value="project" />
+      <playwright-package value="$PROJECT_DIR$/node_modules/@playwright/test" />
+      <working-dir value="$PROJECT_DIR$" />
+      <envs />
+      <scope-kind value="TEST" />
+      <test-file value="$PROJECT_DIR$/e2e/tests/quotes.spec.ts" />
+      <test-names>
+        <test-name value="Quote Management" />
+        <test-name value="should search for products in quote modal" />
+      </test-names>
+      <method v="2" />
+    </configuration>
     <configuration name="npm start" type="js.build_tools.npm">
       <package-json value="$PROJECT_DIR$/package.json" />
       <command value="run" />
@@ -90,6 +141,12 @@
       <envs />
       <method v="2" />
     </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Playwright.Quote Management" />
+        <item itemvalue="Playwright.Quote Management.should search for products in quote modal" />
+      </list>
+    </recent_temporary>
   </component>
   <component name="SharedIndexes">
     <attachedChunks>
@@ -159,6 +216,11 @@
       <workItem from="1749198281238" duration="4372000" />
       <workItem from="1749365744414" duration="3477000" />
       <workItem from="1749409815284" duration="2937000" />
+      <workItem from="1749454284389" duration="11195000" />
+      <workItem from="1749538587812" duration="3654000" />
+      <workItem from="1749641710669" duration="3375000" />
+      <workItem from="1749654172216" duration="10687000" />
+      <workItem from="1749716521200" duration="13825000" />
     </task>
     <task id="LOCAL-00001" summary="inicijalni commit">
       <option name="closed" value="true" />
@@ -386,6 +448,9 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
+    <ignored-roots>
+      <path value="$PROJECT_DIR$" />
+    </ignored-roots>
     <MESSAGE value="Dodana &quot;o nama&quot; stranica. Logo, footer i back button pretvoreni u komponente" />
     <MESSAGE value="ispravak greške" />
     <MESSAGE value="napravljene glavne komponente" />

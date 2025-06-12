@@ -21,7 +21,7 @@ const navigation = [
 
 const userNavigation = [
     {name: 'Vaš profil', href: '/profile'},
-    {name: 'Odjava', href: '/'},
+    {name: 'Odjava'},
 ];
 
 function classNames(...classes: string[]): string {
@@ -128,7 +128,7 @@ function HomePage() {
                                                             }
                                                             return (
                                                                 <Link
-                                                                    to={item.href}
+                                                                    to={item.href!}
                                                                     className={classNames(
                                                                         active ? 'bg-gray-100' : '',
                                                                         'block px-4 py-2 text-sm text-gray-700'
@@ -213,7 +213,7 @@ function HomePage() {
                                             <Disclosure.Button
                                                 key={item.name}
                                                 as={Link}
-                                                to={item.href}
+                                                to={item.href!}
                                                 className="block rounded-md px-3 py-2 text-base font-medium text-gray-400 hover:bg-gray-700 hover:text-white"
                                             >
                                                 {item.name}

@@ -7,7 +7,6 @@ import { getToken } from "../services/AuthSession";
 function Landing() {
     const navigate = useNavigate();
     useEffect(() => {
-        // if a token is present, redirect to /homepage
         const token = getToken();
         if (token) {
             navigate("/homepage");
